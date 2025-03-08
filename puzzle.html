@@ -22,29 +22,7 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Título y texto de instrucciones */
-        .title {
-            position: absolute;
-            top: 20px;
-            text-align: center;
-            width: 100%;
-            color: #333;
-            font-size: 2rem;
-            font-weight: bold;
-            z-index: 1;
-        }
-
-        .instructions {
-            position: absolute;
-            top: 60px;
-            text-align: center;
-            width: 100%;
-            color: #666;
-            font-size: 1rem;
-            z-index: 1;
-        }
-
-        /* Puzzle Container */
+        /* Contenedor del puzzle */
         .puzzle-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -106,11 +84,6 @@
             visibility: visible;
             opacity: 1;
         }
-
-        .overlay h1 {
-            font-size: 2rem;
-        }
-
     </style>
 </head>
 <body>
@@ -118,14 +91,6 @@
     <!-- Overlay de éxito -->
     <div id="overlay" class="overlay">
         <h1>¡Puzzle completado!</h1>
-    </div>
-
-    <!-- Título e instrucciones -->
-    <div class="title">
-        <h1>¡Resuelve el Puzzle!</h1>
-    </div>
-    <div class="instructions">
-        <p>Arrastra las piezas para completar la imagen.</p>
     </div>
 
     <!-- Contenedor del puzzle -->
