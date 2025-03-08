@@ -14,15 +14,18 @@
             height: 100vh;
             background-color: #fff;
             overflow: hidden;
+            position: relative;
         }
         img {
             width: 100vw;
             height: 100vh;
             object-fit: cover;
+            cursor: pointer; /* Para indicar que es clickeable */
+            opacity: 0; /* Inicialmente la imagen está oculta */
+            animation: fadeIn 2s forwards; /* Aplicamos la animación */
         }
-    </style>
-</head>
-<body>
-    <img src="https://camparmusica.github.io/campar/Campar.png">
-</body>
-</html>
+
+        /* Definir la animación de fade-in */
+        @keyframes fadeIn {
+            0% {
+                o
