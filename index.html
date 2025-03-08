@@ -19,6 +19,7 @@
             height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
             background-color: #fff;
             overflow: hidden;
+            position: relative;
         }
 
         /* Estilos para la imagen de fondo */
@@ -28,21 +29,89 @@
             object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
             object-position: center center; /* Asegura que la imagen esté centrada */
             transition: all 0.5s ease; /* Hace que la transición sea suave */
+            cursor: pointer;
         }
 
-        /* Asegura que la imagen se vea bien en dispositivos móviles */
+        /* Estilos para el puzzle */
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .puzzle-piece {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://camparmusica.github.io/Puzzle.png');
+            background-size: 300% 300%; /* Zoom a la imagen */
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Para la pantalla móvil, adaptamos el puzzle */
         @media (max-width: 768px) {
-            img {
-                width: 100%; /* La imagen ocupa el 100% del ancho */
-                height: 100%; /* La imagen ocupa el 100% de la altura */
-                object-fit: cover; /* Mantiene la imagen escalada sin distorsionarse */
-                object-position: center center; /* Centra la imagen */
+            .puzzle-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+
+            .puzzle-piece {
+                background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
             }
         }
     </style>
 </head>
 <body>
-    <!-- Imagen de fondo -->
-    <img src="https://camparmusica.github.io/Campar.png">
+
+    <!-- Imagen de fondo, al hacer clic se carga el puzzle -->
+    <img src="https://camparmusica.github.io/Campar.png" onclick="startPuzzle()">
+
+    <!-- Puzzle (inicialmente oculto) -->
+    <div id="puzzle" class="puzzle-container" style="display: none;">
+        <div class="puzzle-piece" style="background-position: 0% 0%;" onclick="movePiece(0)"></div>
+        <div class="puzzle-piece" style="background-position: 33.33% 0%;" onclick="movePiece(1)"></div>
+        <div class="puzzle-piece" style="background-position: 66.66% 0%;" onclick="movePiece(2)"></div>
+        <div class="puzzle-piece" style="background-position: 0% 33.33%;" onclick="movePiece(3)"></div>
+        <div class="puzzle-piece" style="background-position: 33.33% 33.33%;" onclick="movePiece(4)"></div>
+        <div class="puzzle-piece" style="background-position: 66.66% 33.33%;" onclick="movePiece(5)"></div>
+        <div class="puzzle-piece" style="background-position: 0% 66.66%;" onclick="movePiece(6)"></div>
+        <div class="puzzle-piece" style="background-position: 33.33% 66.66%;" onclick="movePiece(7)"></div>
+        <div class="puzzle-piece" style="background-position: 66.66% 66.66%;" onclick="movePiece(8)"></div>
+    </div>
+
+    <script>
+        let pieces = [];
+        let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // Orden correcto de las piezas
+        let currentOrder = [];
+
+        function startPuzzle() {
+            // Ocultar la imagen y mostrar el puzzle
+            document.querySelector('img').style.display = 'none';
+            document.getElementById('puzzle').style.display = 'grid';
+
+            // Inicializar el puzzle
+            for (let i = 0; i < 9; i++) {
+                currentOrder.push(i);
+            }
+        }
+
+        function movePiece(index) {
+            // Aquí puedes implementar la lógica para mover las piezas del puzzle.
+            // Por simplicidad, estamos sólo haciendo clic y redibujando el puzzle,
+            // pero deberías implementar la lógica completa para mover las piezas.
+
+            // Comprobar si las piezas están en el orden correcto
+            if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
+                window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE";
+            }
+        }
+    </script>
+
 </body>
 </html>
