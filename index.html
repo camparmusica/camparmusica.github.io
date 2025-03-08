@@ -5,27 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campar Música</title>
     <style>
+        /* El body debe ocupar toda la pantalla sin márgenes */
         body {
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
             background-color: #fff;
             overflow: hidden;
-            position: relative;
-        }
-        img {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            cursor: pointer; /* Para indicar que es clickeable */
-            opacity: 0; /* Inicialmente la imagen está oculta */
-            animation: fadeIn 2s forwards; /* Aplicamos la animación */
         }
 
-        /* Definir la animación de fade-in */
-        @keyframes fadeIn {
-            0% {
-                o
+        /* Estilos para la imagen */
+        img {
+            width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
+            height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
+            object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
+        }
+
+        /* Asegura que la imagen se vea bien en dispositivos móviles */
+        @media (max-width: 768px) {
+            img {
+                width: 100%; /* Asegura que la imagen ocupe el 100% del ancho en pantallas pequeñas */
+                height: auto; /* Ajusta la altura automáticamente para mantener la relación de aspecto */
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://camparmusica.github.io/campar/Campar.png">
+</body>
+</html>
