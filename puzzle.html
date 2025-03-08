@@ -30,7 +30,6 @@
             width: 90vw;
             height: 90vh;
             position: relative;
-            margin: 0 auto;
         }
 
         /* Piezas del puzzle */
@@ -54,13 +53,9 @@
             }
 
             .puzzle-piece {
+                background-image: url('https://camparmusica.github.io/puzzlemobile.png');
                 background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
             }
-        }
-
-        /* Animación de transición */
-        .moving {
-            transition: transform 0.3s ease-in-out;
         }
 
         /* Estilo para el overlay de éxito */
@@ -84,6 +79,7 @@
             visibility: visible;
             opacity: 1;
         }
+
     </style>
 </head>
 <body>
@@ -95,15 +91,7 @@
 
     <!-- Contenedor del puzzle -->
     <div id="puzzle" class="puzzle-container">
-        <div id="piece-0" class="puzzle-piece" style="background-position: 0% 0%;" onmousedown="startDrag(event, 0)" ontouchstart="startDrag(event, 0)"></div>
-        <div id="piece-1" class="puzzle-piece" style="background-position: 33.33% 0%;" onmousedown="startDrag(event, 1)" ontouchstart="startDrag(event, 1)"></div>
-        <div id="piece-2" class="puzzle-piece" style="background-position: 66.66% 0%;" onmousedown="startDrag(event, 2)" ontouchstart="startDrag(event, 2)"></div>
-        <div id="piece-3" class="puzzle-piece" style="background-position: 0% 33.33%;" onmousedown="startDrag(event, 3)" ontouchstart="startDrag(event, 3)"></div>
-        <div id="piece-4" class="puzzle-piece" style="background-position: 33.33% 33.33%;" onmousedown="startDrag(event, 4)" ontouchstart="startDrag(event, 4)"></div>
-        <div id="piece-5" class="puzzle-piece" style="background-position: 66.66% 33.33%;" onmousedown="startDrag(event, 5)" ontouchstart="startDrag(event, 5)"></div>
-        <div id="piece-6" class="puzzle-piece" style="background-position: 0% 66.66%;" onmousedown="startDrag(event, 6)" ontouchstart="startDrag(event, 6)"></div>
-        <div id="piece-7" class="puzzle-piece" style="background-position: 33.33% 66.66%;" onmousedown="startDrag(event, 7)" ontouchstart="startDrag(event, 7)"></div>
-        <div id="piece-8" class="puzzle-piece" style="background-position: 66.66% 66.66%;" onmousedown="startDrag(event, 8)" ontouchstart="startDrag(event, 8)"></div>
+        <!-- Las piezas estarán generadas dinámicamente -->
     </div>
 
     <script>
@@ -113,13 +101,51 @@
         let pieces = [];
         let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // Orden correcto de las piezas
         let currentOrder = [];
-
+        
+        const imageUrlDesktop = 'https://camparmusica.github.io/puzzle.png';
+        const imageUrlMobile = 'https://camparmusica.github.io/puzzlemobile.png';
+        
         // Función para iniciar el puzzle
         function startPuzzle() {
+            const container = document.getElementById('puzzle');
+            const isMobile = window.innerWidth <= 768;
+
+            let imageUrl = isMobile ? imageUrlMobile : imageUrlDesktop;
+            let pieceWidth = 100 / 3;
+            let pieceHeight = 100 / 3;
+
             for (let i = 0; i < 9; i++) {
                 currentOrder.push(i);
-                pieces.push(document.getElementById('piece-' + i));
+                const piece = document.createElement('div');
+                piece.classList.add('puzzle-piece');
+                piece.setAttribute('data-id', i);
+
+                // Establecer la posición de fondo de cada pieza
+                let row = Math.floor(i / 3);
+                let col = i % 3;
+                piece.style.backgroundPosition = `${-col * pieceWidth}% ${-row * pieceHeight}%`;
+                piece.style.backgroundImage = `url('${imageUrl}')`;
+
+                piece.setAttribute('draggable', true);
+                piece.addEventListener('mousedown', (e) => startDrag(e, i));
+                piece.addEventListener('touchstart', (e) => startDrag(e, i));
+                
+                container.appendChild(piece);
+                pieces.push(piece);
             }
+
+            shufflePieces();
+        }
+
+        // Función para mezclar las piezas
+        function shufflePieces() {
+            let shuffledOrder = [...currentOrder];
+            shuffledOrder = shuffledOrder.sort(() => Math.random() - 0.5);
+            
+            pieces.forEach((piece, index) => {
+                let newIndex = shuffledOrder[index];
+                piece.style.order = newIndex;
+            });
         }
 
         // Función que maneja el drag de las piezas
@@ -129,14 +155,11 @@
             currentPiece = pieces[index];
             offsetX = (e.clientX || e.touches[0].clientX) - currentPiece.getBoundingClientRect().left;
             offsetY = (e.clientY || e.touches[0].clientY) - currentPiece.getBoundingClientRect().top;
-            
+
             currentPiece.classList.add('moving');
 
-            // Añadir el evento para el movimiento
             window.addEventListener('mousemove', dragPiece);
             window.addEventListener('touchmove', dragPiece);
-            
-            // Y para dejar la pieza
             window.addEventListener('mouseup', dropPiece);
             window.addEventListener('touchend', dropPiece);
         }
@@ -154,19 +177,26 @@
             isDragging = false;
             currentPiece.classList.remove('moving');
             currentPiece.style.transform = '';
-            
-            // Comprobar si las piezas están en el orden correcto
-            if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
-                document.getElementById('overlay').classList.add('show');
-                setTimeout(() => {
-                    window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE";
-                }, 2000); // Redirigir después de 2 segundos
-            }
 
+            // Verificar si las piezas están ordenadas
+            checkPuzzleOrder();
+            
             window.removeEventListener('mousemove', dragPiece);
             window.removeEventListener('touchmove', dragPiece);
             window.removeEventListener('mouseup', dropPiece);
             window.removeEventListener('touchend', dropPiece);
+        }
+
+        // Función para comprobar si el puzzle está completo
+        function checkPuzzleOrder() {
+            const currentPuzzleOrder = pieces.map(piece => parseInt(piece.getAttribute('data-id')));
+            
+            if (JSON.stringify(currentPuzzleOrder) === JSON.stringify(correctOrder)) {
+                document.getElementById('overlay').classList.add('show');
+                setTimeout(() => {
+                    window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE"; // Redirigir al enlace
+                }, 2000);
+            }
         }
 
         // Inicializar el puzzle
