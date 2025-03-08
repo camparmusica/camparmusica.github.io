@@ -19,6 +19,7 @@
             height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
             background-color: #fff;
             overflow: hidden;
+            position: relative;
         }
 
         /* Estilos para la imagen de fondo */
@@ -28,23 +29,129 @@
             object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
             object-position: center center; /* Asegura que la imagen esté centrada */
             transition: all 0.5s ease; /* Hace que la transición sea suave */
+            cursor: pointer;
         }
 
-        /* Asegura que la imagen se vea bien en dispositivos móviles */
+        /* Estilos para el puzzle */
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .puzzle-piece {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://camparmusica.github.io/Puzzle.png');
+            background-size: 300% 300%; /* Zoom a la imagen */
+            background-position: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Para la pantalla móvil, adaptamos el puzzle */
         @media (max-width: 768px) {
-            img {
-                width: 100%; /* La imagen ocupa el 100% del ancho */
-                height: 100%; /* La imagen ocupa el 100% de la altura */
-                object-fit: cover; /* Mantiene la imagen escalada sin distorsionarse */
-                object-position: center center; /* Centra la imagen */
+            .puzzle-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
             }
+
+            .puzzle-piece {
+                background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
+            }
+        }
+
+        /* Animación de transición */
+        .moving {
+            transition: transform 0.3s ease-in-out;
         }
     </style>
 </head>
 <body>
-    <!-- Imagen de fondo que sirve como enlace al puzzle -->
-    <a href="https://camparmusica.github.io/puzzle.html">
-        <img src="https://camparmusica.github.io/Campar.png" alt="Imagen principal">
-    </a>
+
+    <!-- Imagen de fondo, al hacer clic se carga el puzzle -->
+    <img src="https://camparmusica.github.io/Campar.png" onclick="startPuzzle()">
+
+    <!-- Puzzle (inicialmente oculto) -->
+    <div id="puzzle" class="puzzle-container" style="display: none;">
+        <div id="piece-0" class="puzzle-piece" style="background-position: 0% 0%;" onmousedown="startDrag(event, 0)" ontouchstart="startDrag(event, 0)"></div>
+        <div id="piece-1" class="puzzle-piece" style="background-position: 33.33% 0%;" onmousedown="startDrag(event, 1)" ontouchstart="startDrag(event, 1)"></div>
+        <div id="piece-2" class="puzzle-piece" style="background-position: 66.66% 0%;" onmousedown="startDrag(event, 2)" ontouchstart="startDrag(event, 2)"></div>
+        <div id="piece-3" class="puzzle-piece" style="background-position: 0% 33.33%;" onmousedown="startDrag(event, 3)" ontouchstart="startDrag(event, 3)"></div>
+        <div id="piece-4" class="puzzle-piece" style="background-position: 33.33% 33.33%;" onmousedown="startDrag(event, 4)" ontouchstart="startDrag(event, 4)"></div>
+        <div id="piece-5" class="puzzle-piece" style="background-position: 66.66% 33.33%;" onmousedown="startDrag(event, 5)" ontouchstart="startDrag(event, 5)"></div>
+        <div id="piece-6" class="puzzle-piece" style="background-position: 0% 66.66%;" onmousedown="startDrag(event, 6)" ontouchstart="startDrag(event, 6)"></div>
+        <div id="piece-7" class="puzzle-piece" style="background-position: 33.33% 66.66%;" onmousedown="startDrag(event, 7)" ontouchstart="startDrag(event, 7)"></div>
+        <div id="piece-8" class="puzzle-piece" style="background-position: 66.66% 66.66%;" onmousedown="startDrag(event, 8)" ontouchstart="startDrag(event, 8)"></div>
+    </div>
+
+    <script>
+        let isDragging = false;
+        let currentPiece = null;
+        let offsetX = 0, offsetY = 0;
+        let pieces = [];
+        let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // Orden correcto de las piezas
+        let currentOrder = [];
+
+        function startPuzzle() {
+            // Ocultar la imagen y mostrar el puzzle
+            document.querySelector('img').style.display = 'none';
+            document.getElementById('puzzle').style.display = 'grid';
+
+            // Inicializar el puzzle
+            for (let i = 0; i < 9; i++) {
+                currentOrder.push(i);
+                pieces.push(document.getElementById('piece-' + i));
+            }
+        }
+
+        function startDrag(e, index) {
+            e.preventDefault();
+            isDragging = true;
+            currentPiece = pieces[index];
+            offsetX = (e.clientX || e.touches[0].clientX) - currentPiece.getBoundingClientRect().left;
+            offsetY = (e.clientY || e.touches[0].clientY) - currentPiece.getBoundingClientRect().top;
+            
+            currentPiece.classList.add('moving');
+
+            // Añadir el evento para el movimiento
+            window.addEventListener('mousemove', dragPiece);
+            window.addEventListener('touchmove', dragPiece);
+            
+            // Y para dejar la pieza
+            window.addEventListener('mouseup', dropPiece);
+            window.addEventListener('touchend', dropPiece);
+        }
+
+        function dragPiece(e) {
+            if (!isDragging) return;
+            const x = (e.clientX || e.touches[0].clientX) - offsetX;
+            const y = (e.clientY || e.touches[0].clientY) - offsetY;
+            currentPiece.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        function dropPiece() {
+            isDragging = false;
+            currentPiece.classList.remove('moving');
+            currentPiece.style.transform = '';
+            
+            // Comprobar si las piezas están en el orden correcto
+            if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
+                window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE";
+            }
+
+            window.removeEventListener('mousemove', dragPiece);
+            window.removeEventListener('touchmove', dragPiece);
+            window.removeEventListener('mouseup', dropPiece);
+            window.removeEventListener('touchend', dropPiece);
+        }
+    </script>
+
 </body>
 </html>
