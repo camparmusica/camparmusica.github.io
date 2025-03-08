@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar - Puzzle</title>
+    <title>Campar - Atrapando el Logo</title>
     
     <!-- Favicon -->
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
@@ -13,194 +13,59 @@
         body {
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
-            background-color: #f5f5f5;
+            background-image: url('https://camparmusica.github.io/fondo.png');
+            background-size: cover;
+            background-position: center;
             overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Contenedor del puzzle */
-        .puzzle-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            width: 90vw;
-            height: 90vh;
-            position: relative;
-        }
-
-        /* Piezas del puzzle */
-        .puzzle-piece {
-            width: 100%;
-            height: 100%;
-            background-image: url('https://camparmusica.github.io/puzzle.png');
-            background-size: 300% 300%;
-            transition: transform 0.2s ease-in-out;
-            cursor: pointer;
-            position: relative;
-        }
-
-        /* Para la pantalla móvil */
-        @media (max-width: 768px) {
-            .puzzle-container {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(3, 1fr);
-                width: 95vw;
-                height: 80vh;
-            }
-
-            .puzzle-piece {
-                background-image: url('https://camparmusica.github.io/puzzlemobile.png');
-                background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
-            }
-        }
-
-        /* Estilo para el overlay de éxito */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
-        .overlay.show {
-            visibility: visible;
-            opacity: 1;
+        /* El logo */
+        #logo {
+            position: absolute;
+            width: 100px;  /* Ajusta el tamaño del logo */
+            height: 100px;
+            background-image: url('https://camparmusica.github.io/logo.png');
+            background-size: cover;
+            cursor: pointer;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Overlay de éxito -->
-    <div id="overlay" class="overlay">
-        <h1>¡Puzzle completado!</h1>
-    </div>
-
-    <!-- Contenedor del puzzle -->
-    <div id="puzzle" class="puzzle-container">
-        <!-- Las piezas estarán generadas dinámicamente -->
-    </div>
+    <div id="logo"></div>
 
     <script>
-        let isDragging = false;
-        let currentPiece = null;
-        let offsetX = 0, offsetY = 0;
-        let pieces = [];
-        let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // Orden correcto de las piezas
-        let currentOrder = [];
+        // Enlace al que redirigir
+        const link = "https://www.youtube.com/watch?v=6zcULsek1cE";
         
-        const imageUrlDesktop = 'https://camparmusica.github.io/puzzle.png';
-        const imageUrlMobile = 'https://camparmusica.github.io/puzzlemobile.png';
+        const logo = document.getElementById('logo');
         
-        // Función para iniciar el puzzle
-        function startPuzzle() {
-            const container = document.getElementById('puzzle');
-            const isMobile = window.innerWidth <= 768;
+        // Función para mover el logo aleatoriamente
+        function moveLogo() {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
 
-            let imageUrl = isMobile ? imageUrlMobile : imageUrlDesktop;
-            let pieceWidth = 100 / 3;
-            let pieceHeight = 100 / 3;
+            // Calcular posiciones aleatorias dentro de la pantalla
+            const randomX = Math.random() * (screenWidth - 100);  // Ajuste para el tamaño del logo
+            const randomY = Math.random() * (screenHeight - 100);  // Ajuste para el tamaño del logo
 
-            for (let i = 0; i < 9; i++) {
-                currentOrder.push(i);
-                const piece = document.createElement('div');
-                piece.classList.add('puzzle-piece');
-                piece.setAttribute('data-id', i);
-
-                // Establecer la posición de fondo de cada pieza
-                let row = Math.floor(i / 3);
-                let col = i % 3;
-                piece.style.backgroundPosition = `${-col * pieceWidth}% ${-row * pieceHeight}%`;
-                piece.style.backgroundImage = `url('${imageUrl}')`;
-
-                piece.setAttribute('draggable', true);
-                piece.addEventListener('mousedown', (e) => startDrag(e, i));
-                piece.addEventListener('touchstart', (e) => startDrag(e, i));
-                
-                container.appendChild(piece);
-                pieces.push(piece);
-            }
-
-            shufflePieces();
+            // Mover el logo a la nueva posición
+            logo.style.left = randomX + 'px';
+            logo.style.top = randomY + 'px';
         }
 
-        // Función para mezclar las piezas
-        function shufflePieces() {
-            let shuffledOrder = [...currentOrder];
-            shuffledOrder = shuffledOrder.sort(() => Math.random() - 0.5);
-            
-            pieces.forEach((piece, index) => {
-                let newIndex = shuffledOrder[index];
-                piece.style.order = newIndex;
-            });
-        }
+        // Hacer que el logo se mueva cada 1 segundo
+        setInterval(moveLogo, 1000);
 
-        // Función que maneja el drag de las piezas
-        function startDrag(e, index) {
-            e.preventDefault();
-            isDragging = true;
-            currentPiece = pieces[index];
-            offsetX = (e.clientX || e.touches[0].clientX) - currentPiece.getBoundingClientRect().left;
-            offsetY = (e.clientY || e.touches[0].clientY) - currentPiece.getBoundingClientRect().top;
-
-            currentPiece.classList.add('moving');
-
-            window.addEventListener('mousemove', dragPiece);
-            window.addEventListener('touchmove', dragPiece);
-            window.addEventListener('mouseup', dropPiece);
-            window.addEventListener('touchend', dropPiece);
-        }
-
-        // Función que maneja el movimiento de la pieza
-        function dragPiece(e) {
-            if (!isDragging) return;
-            const x = (e.clientX || e.touches[0].clientX) - offsetX;
-            const y = (e.clientY || e.touches[0].clientY) - offsetY;
-            currentPiece.style.transform = `translate(${x}px, ${y}px)`;
-        }
-
-        // Función para soltar la pieza
-        function dropPiece() {
-            isDragging = false;
-            currentPiece.classList.remove('moving');
-            currentPiece.style.transform = '';
-
-            // Verificar si las piezas están ordenadas
-            checkPuzzleOrder();
-            
-            window.removeEventListener('mousemove', dragPiece);
-            window.removeEventListener('touchmove', dragPiece);
-            window.removeEventListener('mouseup', dropPiece);
-            window.removeEventListener('touchend', dropPiece);
-        }
-
-        // Función para comprobar si el puzzle está completo
-        function checkPuzzleOrder() {
-            const currentPuzzleOrder = pieces.map(piece => parseInt(piece.getAttribute('data-id')));
-            
-            if (JSON.stringify(currentPuzzleOrder) === JSON.stringify(correctOrder)) {
-                document.getElementById('overlay').classList.add('show');
-                setTimeout(() => {
-                    window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE"; // Redirigir al enlace
-                }, 2000);
-            }
-        }
-
-        // Inicializar el puzzle
-        startPuzzle();
+        // Redirigir al hacer clic en el logo
+        logo.addEventListener('click', function() {
+            window.location.href = link;
+        });
     </script>
 
 </body>
