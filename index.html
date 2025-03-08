@@ -26,13 +26,17 @@
             width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
             height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
             object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
+            object-position: center center; /* Asegura que la imagen esté centrada */
+            transition: all 0.5s ease; /* Hace que la transición sea suave */
         }
 
         /* Asegura que la imagen se vea bien en dispositivos móviles */
         @media (max-width: 768px) {
             img {
-                width: 100%; /* Asegura que la imagen ocupe el 100% del ancho en pantallas pequeñas */
-                height: auto; /* Ajusta la altura automáticamente para mantener la relación de aspecto */
+                width: 100%; /* La imagen ocupa el 100% del ancho */
+                height: 100%; /* La imagen ocupa el 100% de la altura */
+                object-fit: cover; /* Mantiene la imagen escalada sin distorsionarse */
+                object-position: center center; /* Centra la imagen */
             }
         }
     </style>
@@ -41,3 +45,4 @@
     <!-- Imagen de fondo -->
     <img src="https://camparmusica.github.io/campar/Campar.png">
 </body>
+</html>
