@@ -19,26 +19,44 @@
             height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
             background-color: #fff;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         }
 
-        /* Estilos para la imagen de fondo */
-        img {
-            width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
-            height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
-            object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
+        /* Estilo para la imagen de fondo */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("https://camparmusica.github.io/campar/campar.png");
+            background-size: cover; /* Asegura que la imagen cubra toda el área sin distorsionarse */
+            background-position: center; /* Centra la imagen */
+            background-repeat: no-repeat;
+            z-index: -1; /* Coloca la imagen en el fondo */
+        }
+
+        /* Estilos adicionales para la página */
+        .container {
+            text-align: center;
+            z-index: 1;
         }
 
         /* Asegura que la imagen se vea bien en dispositivos móviles */
         @media (max-width: 768px) {
-            img {
-                width: 100%; /* Asegura que la imagen ocupe el 100% del ancho en pantallas pequeñas */
-                height: auto; /* Ajusta la altura automáticamente para mantener la relación de aspecto */
+            .background {
+                background-position: top center; /* Ajusta la posición para pantallas pequeñas */
             }
         }
     </style>
 </head>
 <body>
     <!-- Imagen de fondo -->
-    <img src="https://camparmusica.github.io/campar/campar.png">
+    <div class="background"></div>
+
+    <!-- Contenedor para otros elementos (si los tienes en el futuro) -->
+    <div class="container">
+        <!-- Aquí puedes agregar otros elementos, si es necesario -->
+    </div>
 </body>
 </html>
