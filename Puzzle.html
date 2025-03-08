@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campar - Puzzle</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://camparmusica.github.io/Favicon.png" type="image/png">
+
+    <style>
+        /* El body debe ocupar toda la pantalla sin márgenes */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Título y texto de instrucciones */
+        .title {
+            position: absolute;
+            top: 20px;
+            text-align: center;
+            width: 100%;
+            color: #333;
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 1;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 60px;
+            text-align: center;
+            width: 100%;
+            color: #666;
+            font-size: 1rem;
+            z-index: 1;
+        }
+
+        /* Puzzle Container */
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 90vw;
+            height: 90vh;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* Piezas del puzzle */
+        .puzzle-piece {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://camparmusica.github.io/Puzzle.png');
+            background-size: 300% 300%;
+            transition: transform 0.2s ease-in-out;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Para la pantalla móvil */
+        @media (max-width: 768px) {
+            .puzzle-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+                width: 95vw;
+                height: 80vh;
+            }
+
+            .puzzle-piece {
+                background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
+            }
+        }
+
+        /* Animación de transición */
+        .moving {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Estilo para el overlay de éxito */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            justify-content: center;
