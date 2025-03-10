@@ -30,16 +30,24 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: url('https://camparmusica.github.io/fondo.png');
-            background-size: cover;
-            background-position: center;
+        }
+        
+        /* Para asegurar que la imagen se adapte correctamente */
+        img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
 
     <!-- Pantalla de introducción con la imagen logo+fondo.png -->
-    
+    <div id="introImage">
+        <!-- Esto asegurará que se vea la imagen de fondo mientras se muestra el inicio -->
+        <img src="https://camparmusica.github.io/logo+fondo.png" alt="Campar Logo">
+    </div>
+
     <!-- Contenedor del juego -->
     <div id="gameContainer">
         <canvas id="gameCanvas" width="300" height="300"></canvas>
@@ -49,7 +57,7 @@
         // Esperar 3 segundos antes de cambiar a la pantalla del juego
         setTimeout(() => {
             // Eliminar la imagen de introducción
-            document.body.style.backgroundImage = 'none'; // Eliminar la imagen de introducción
+            document.getElementById("introImage").style.display = 'none'; // Eliminar la imagen de introducción
             document.getElementById("gameContainer").style.display = "flex"; // Mostrar el juego
         }, 3000); // Cambiar después de 3 segundos
     </script>
