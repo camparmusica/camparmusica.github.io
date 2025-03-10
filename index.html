@@ -3,54 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title> <!-- Nombre de la pestaña en el navegador -->
-    
-    <!-- Favicon -->
-    <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
-
-    <style>
-        /* El body debe ocupar toda la pantalla sin márgenes */
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
-            background-color: #fff;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Estilos para la imagen de fondo */
-        img {
-            width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
-            height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
-            object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
-            object-position: center center; /* Asegura que la imagen esté centrada */
-            cursor: pointer;
-        }
-
-        /* Estilo para la pantalla de inicio */
-        .start-page {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://camparmusica.github.io/campar.png') no-repeat center center;
-            background-size: cover;
-            cursor: pointer; /* Cambia el cursor al pasar sobre la imagen */
-        }
-
-        canvas {
-            display: none; /* El canvas está oculto hasta que comience el juego */
-    <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campar</title>
     
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
@@ -67,23 +19,24 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
             position: relative;
         }
 
         canvas {
-            display: none;
+            display: none; /* Se oculta hasta que inicie el juego */
             image-rendering: pixelated;
         }
 
         .play-button {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: transparent;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
             position: absolute;
+            cursor: pointer;
         }
 
         .play-button::before {
@@ -115,13 +68,14 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
+        // Iniciar juego al hacer clic en el botón
         playButton.addEventListener("click", startGame);
         playButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            playButton.style.display = "none";
-            canvas.style.display = "block";
-            gameLoop();
+            playButton.style.display = "none"; // Oculta el botón de inicio
+            canvas.style.display = "block"; // Muestra el juego
+            gameLoop(); // Comienza el juego
         }
 
         document.addEventListener("keydown", event => {
