@@ -8,31 +8,23 @@
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
     
     <style>
+        /* El body debe ocupar toda la pantalla sin márgenes */
         body {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
+            width: 100vw; /* Asegura que el cuerpo ocupe toda la anchura de la pantalla */
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            background: url('https://camparmusica.github.io/campar.png') no-repeat center center; 
+            background-size: cover; /* Asegura que la imagen cubra el 100% de la pantalla sin distorsionarse */
         }
 
-        /* Contenedor de la imagen de introducción */
-        #intro {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('https://camparmusica.github.io/campar.png') no-repeat center center;
-            background-size: cover; /* La imagen cubre toda la pantalla sin dejar bordes */
-        }
-
-        /* Contenedor del juego */
+        /* Estilos para el juego que se mostrará después */
         #gameContainer {
-            display: none;
+            display: none; /* Inicialmente oculto */
             width: 100%;
             height: 100%;
             display: flex;
@@ -46,7 +38,9 @@
 </head>
 <body>
 
-    <div id="intro"></div> <!-- Pantalla de presentación -->
+    <div id="intro"></div> <!-- Pantalla de introducción con la imagen campar.png -->
+    
+    <!-- Contenedor del juego -->
     <div id="gameContainer">
         <canvas id="gameCanvas" width="300" height="300"></canvas>
     </div>
@@ -54,9 +48,10 @@
     <script>
         // Esperar 3 segundos antes de cambiar a la pantalla del juego
         setTimeout(() => {
-            document.getElementById("intro").style.display = "none";
+            // Ocultar la pantalla de introducción y mostrar el juego
+            document.body.style.backgroundImage = 'none'; // Eliminar la imagen de introducción
             document.getElementById("gameContainer").style.display = "flex";
-        }, 3000);
+        }, 3000); // Cambiar después de 3 segundos
     </script>
 
 </body>
