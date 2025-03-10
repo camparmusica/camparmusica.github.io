@@ -3,148 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title> <!-- Nombre de la pestaña en el navegador -->
+    <title>Campar</title>
     
-    <!-- Favicon -->
+    <!-- Favicon para navegadores de escritorio -->
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
+    
+    <!-- Icono para dispositivos móviles (cuando se guarda la página) -->
+    <link rel="apple-touch-icon" href="https://camparmusica.github.io/favicon.png">
 
     <style>
-        /* El body debe ocupar toda la pantalla sin márgenes */
         body {
             margin: 0;
             padding: 0;
+            height: 100vh;
+            background-image: url('https://camparmusica.github.io/fondo.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
-            background-color: #fff;
-            overflow: hidden;
+            cursor: pointer;
             position: relative;
         }
 
-        /* Estilos para la imagen de fondo */
-        img {
-            width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
-            height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
-            object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
-            object-position: center center; /* Asegura que la imagen esté centrada */
-            transition: all 0.5s ease; /* Hace que la transición sea suave */
-            cursor: pointer;
+        canvas {
+            display: none;
+            image-rendering: pixelated;
         }
 
-        /* Estilos para el puzzle */
-        .puzzle-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            width: 100%;
-            height: 100vh;
+        .play-button {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
             position: absolute;
-            top: 0;
-            left: 0;
         }
 
-        .puzzle-piece {
-            width: 100%;
-            height: 100%;
-            background-image: url('https://camparmusica.github.io/puzzle.png');
-            background-size: 300% 300%; /* Zoom a la imagen */
-            background-position: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        /* Para la pantalla móvil, adaptamos el puzzle */
-        @media (max-width: 768px) {
-            .puzzle-container {
-                grid-template-columns: repeat(3, 1fr);
-                grid-template-rows: repeat(3, 1fr);
-            }
-
-            .puzzle-piece {
-                background-size: 300% 300%; /* Ajuste para pantallas pequeñas */
-            }
-        }
-
-        /* Animación de transición */
-        .moving {
-            transition: transform 0.3s ease-in-out;
+        .play-button::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 20px solid #321311;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
         }
     </style>
 </head>
 <body>
-
-    <!-- Imagen de fondo, al hacer clic se carga el puzzle -->
-    <img src="https://camparmusica.github.io/campar.png" onclick="startPuzzle()">
-
-    <!-- Puzzle (inicialmente oculto) -->
-    <div id="puzzle" class="puzzle-container" style="display: none;">
-        <div id="piece-0" class="puzzle-piece" style="background-position: 0% 0%;" onmousedown="startDrag(event, 0)" ontouchstart="startDrag(event, 0)"></div>
-        <div id="piece-1" class="puzzle-piece" style="background-position: 33.33% 0%;" onmousedown="startDrag(event, 1)" ontouchstart="startDrag(event, 1)"></div>
-        <div id="piece-2" class="puzzle-piece" style="background-position: 66.66% 0%;" onmousedown="startDrag(event, 2)" ontouchstart="startDrag(event, 2)"></div>
-        <div id="piece-3" class="puzzle-piece" style="background-position: 0% 33.33%;" onmousedown="startDrag(event, 3)" ontouchstart="startDrag(event, 3)"></div>
-        <div id="piece-4" class="puzzle-piece" style="background-position: 33.33% 33.33%;" onmousedown="startDrag(event, 4)" ontouchstart="startDrag(event, 4)"></div>
-        <div id="piece-5" class="puzzle-piece" style="background-position: 66.66% 33.33%;" onmousedown="startDrag(event, 5)" ontouchstart="startDrag(event, 5)"></div>
-        <div id="piece-6" class="puzzle-piece" style="background-position: 0% 66.66%;" onmousedown="startDrag(event, 6)" ontouchstart="startDrag(event, 6)"></div>
-        <div id="piece-7" class="puzzle-piece" style="background-position: 33.33% 66.66%;" onmousedown="startDrag(event, 7)" ontouchstart="startDrag(event, 7)"></div>
-        <div id="piece-8" class="puzzle-piece" style="background-position: 66.66% 66.66%;" onmousedown="startDrag(event, 8)" ontouchstart="startDrag(event, 8)"></div>
-    </div>
+    <div class="play-button" id="playButton"></div>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
 
     <script>
-        let isDragging = false;
-        let currentPiece = null;
-        let offsetX = 0, offsetY = 0;
-        let pieces = [];
-        let correctOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // Orden correcto de las piezas
-        let currentOrder = [];
+        const canvas = document.getElementById("gameCanvas");
+        const playButton = document.getElementById("playButton");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+        let direction = "RIGHT";
+        let food = {x: 100, y: 100};
+        let score = 0;
+        const link = "https://www.google.com/search?q=campar&oq=campar+";
 
-        function startPuzzle() {
-            // Ocultar la imagen y mostrar el puzzle
-            window.location.href = "puzzle.html"; // Redirigir a puzzle.html
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        playButton.addEventListener("click", startGame);
+        playButton.addEventListener("touchstart", startGame);
+
+        function startGame() {
+            playButton.style.display = "none";
+            canvas.style.display = "block";
+            gameLoop();
         }
 
-        function startDrag(e, index) {
-            e.preventDefault();
-            isDragging = true;
-            currentPiece = pieces[index];
-            offsetX = (e.clientX || e.touches[0].clientX) - currentPiece.getBoundingClientRect().left;
-            offsetY = (e.clientY || e.touches[0].clientY) - currentPiece.getBoundingClientRect().top;
-            
-            currentPiece.classList.add('moving');
+        document.addEventListener("keydown", event => {
+            changeDirection(event.key);
+        });
 
-            // Añadir el evento para el movimiento
-            window.addEventListener('mousemove', dragPiece);
-            window.addEventListener('touchmove', dragPiece);
-            
-            // Y para dejar la pieza
-            window.addEventListener('mouseup', dropPiece);
-            window.addEventListener('touchend', dropPiece);
-        }
+        canvas.addEventListener("touchstart", event => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
 
-        function dragPiece(e) {
-            if (!isDragging) return;
-            const x = (e.clientX || e.touches[0].clientX) - offsetX;
-            const y = (e.clientY || e.touches[0].clientY) - offsetY;
-            currentPiece.style.transform = `translate(${x}px, ${y}px)`;
-        }
+        canvas.addEventListener("touchmove", event => {
+            if (event.touches.length > 1) return; 
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
 
-        function dropPiece() {
-            isDragging = false;
-            currentPiece.classList.remove('moving');
-            currentPiece.style.transform = '';
-            
-            // Comprobar si las piezas están en el orden correcto
-            if (JSON.stringify(currentOrder) === JSON.stringify(correctOrder)) {
-                window.location.href = "https://www.youtube.com/watch?v=6zcULsek1cE";
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+            } else {
+                if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
             }
+        });
 
-            window.removeEventListener('mousemove', dragPiece);
-            window.removeEventListener('touchmove', dragPiece);
-            window.removeEventListener('mouseup', dropPiece);
-            window.removeEventListener('touchend', dropPiece);
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+        }
+
+        function drawBackground() {
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+
+        function gameLoop() {
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= gridSize;
+            if (direction === "DOWN") head.y += gridSize;
+            if (direction === "LEFT") head.x -= gridSize;
+            if (direction === "RIGHT") head.x += gridSize;
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                if (score === 3) window.location.href = link;
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+            } else {
+                snake.pop();
+            }
+            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+                direction = "RIGHT";
+                score = 0;
+            }
+            
+            drawBackground();
+            
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+            });
+            
+            ctx.fillStyle = "#F20000";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            
+            setTimeout(gameLoop, 100);
         }
     </script>
-
 </body>
 </html>
+
