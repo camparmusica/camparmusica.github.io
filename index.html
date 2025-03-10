@@ -23,30 +23,19 @@
         }
 
         canvas {
-            display: none; /* Se oculta hasta que inicie el juego */
+            display: none; /* Se mostrará solo cuando inicie el juego */
             image-rendering: pixelated;
         }
 
         .play-button {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            position: absolute;
+            width: 100px; 
+            height: 100px;
+            background-image: url('https://camparmusica.github.io/logo.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             cursor: pointer;
-        }
-
-        .play-button::before {
-            content: "";
-            display: block;
-            width: 0;
-            height: 0;
-            border-left: 20px solid #321311;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
+            position: absolute;
         }
     </style>
 </head>
@@ -68,14 +57,13 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
-        // Iniciar juego al hacer clic en el botón
         playButton.addEventListener("click", startGame);
         playButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            playButton.style.display = "none"; // Oculta el botón de inicio
+            playButton.style.display = "none";  // Oculta el logo
             canvas.style.display = "block"; // Muestra el juego
-            gameLoop(); // Comienza el juego
+            gameLoop();
         }
 
         document.addEventListener("keydown", event => {
