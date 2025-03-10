@@ -27,6 +27,26 @@
             display: none;
             image-rendering: pixelated;
         }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            position: absolute;
+        }
+
+        .play-button::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 20px solid #321311;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+        }
     </style>
 </head>
 <body>
@@ -47,11 +67,14 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
-        playButton.addEventListener("click", () => {
+        playButton.addEventListener("click", startGame);
+        playButton.addEventListener("touchstart", startGame);
+
+        function startGame() {
             playButton.style.display = "none";
             canvas.style.display = "block";
             gameLoop();
-        });
+        }
 
         document.addEventListener("keydown", event => {
             changeDirection(event.key);
@@ -86,8 +109,12 @@
         }
 
         function drawBackground() {
-            ctx.fillStyle = "#26A31C";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
         }
 
         function gameLoop() {
