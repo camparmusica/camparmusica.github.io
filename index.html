@@ -12,14 +12,16 @@
     <link rel="apple-touch-icon" href="https://camparmusica.github.io/favicon.png">
 
     <style>
+        /* Estilos generales para el body */
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
             background-image: url('https://camparmusica.github.io/fondo.png');
-            background-size: cover;
-            background-position: center;
-            overflow: hidden;
+            background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+            background-position: center; /* Centra la imagen en la pantalla */
+            background-repeat: no-repeat; /* Evita que se repita la imagen */
+            overflow: hidden; /* Elimina barras de desplazamiento */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -27,11 +29,13 @@
             position: relative;
         }
 
+        /* Ocultamos el canvas antes de iniciar el juego */
         canvas {
             display: none;
             image-rendering: pixelated;
         }
 
+        /* Botón de play */
         .play-button {
             width: 50px;
             height: 50px;
