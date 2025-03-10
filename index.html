@@ -3,68 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title>
-    
-    <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
-    
+    <title>Campar Música</title>
     <style>
-        /* El body debe ocupar toda la pantalla sin márgenes */
-        body {
+        /* Asegura que el body ocupe todo el alto y ancho de la pantalla */
+        html, body {
+            height: 100%;
             margin: 0;
             padding: 0;
-            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
-            width: 100vw; /* Asegura que el cuerpo ocupe toda la anchura de la pantalla */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            background: none; /* Asegura que no haya fondo amarillo */
         }
 
-        /* Pantalla de introducción */
-        #introImage {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('https://camparmusica.github.io/logo+fondo.png') no-repeat center center; 
-            background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-            cursor: pointer; /* Cambia el cursor al pasar sobre la imagen */
+        /* Aplica la imagen de fondo a todo el body */
+        body {
+            background-image: url('logo+fondo.png'); /* Ruta de la imagen */
+            background-size: cover; /* Hace que la imagen cubra toda la pantalla */
+            background-position: center center; /* Centra la imagen */
+            background-repeat: no-repeat; /* Evita que la imagen se repita */
         }
-
-        /* Contenedor del juego que se muestra después */
-        #gameContainer {
-            display: none; /* Inicialmente oculto */
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
     </style>
 </head>
 <body>
-
-    <!-- Pantalla de introducción con la imagen logo+fondo.png -->
-    <div id="introImage">
-        <!-- Esto asegurará que se vea la imagen de fondo mientras se muestra el inicio -->
-    </div>
-
-    <!-- Contenedor del juego -->
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="300" height="300"></canvas>
-    </div>
-
-    <script>
-        // Esperar 3 segundos antes de cambiar a la pantalla del juego
-        setTimeout(() => {
-            // Eliminar la imagen de introducción
-            document.getElementById("introImage").style.display = 'none'; // Eliminar la imagen de introducción
-            document.getElementById("gameContainer").style.display = "flex"; // Mostrar el juego
-        }, 3000); // Cambiar después de 3 segundos
-    </script>
-
 </body>
 </html>
