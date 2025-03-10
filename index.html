@@ -12,30 +12,27 @@
     <link rel="apple-touch-icon" href="https://camparmusica.github.io/favicon.png">
 
     <style>
-        /* Estilos generales para el body */
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            height: 100vh;
-            background-image: url('https://camparmusica.github.io/fondo.png');
-            background-size: cover; /* Asegura que la imagen cubra todo el fondo */
-            background-position: center; /* Centra la imagen en la pantalla */
-            background-repeat: no-repeat; /* Evita que se repita la imagen */
-            overflow: hidden; /* Elimina barras de desplazamiento */
+            height: 100%;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
-            position: relative;
+            background-color: #000;
         }
 
-        /* Ocultamos el canvas antes de iniciar el juego */
-        canvas {
-            display: none;
-            image-rendering: pixelated;
+        .start-page {
+            width: 100%;
+            height: 100%;
+            background: url('https://camparmusica.github.io/campar.png') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Botón de play */
         .play-button {
             width: 50px;
             height: 50px;
@@ -55,10 +52,16 @@
             border-top: 12px solid transparent;
             border-bottom: 12px solid transparent;
         }
+
+        canvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="play-button" id="playButton"></div>
+    <div class="start-page">
+        <div class="play-button" id="playButton"></div>
+    </div>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
 
     <script>
@@ -79,7 +82,7 @@
         playButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            playButton.style.display = "none";
+            document.querySelector('.start-page').style.display = "none";
             canvas.style.display = "block";
             gameLoop();
         }
