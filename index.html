@@ -3,70 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title>
+    <title>Campar</title> <!-- Nombre de la pestaña en el navegador -->
     
-    <!-- Favicon para navegador (también funciona en móviles) -->
+    <!-- Favicon -->
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
-    
-    <!-- Favicon para dispositivos Apple cuando se guarda en la pantalla de inicio -->
-    <link rel="apple-touch-icon" href="https://camparmusica.github.io/favicon.png">
 
     <style>
-        body, html {
+        /* El body debe ocupar toda la pantalla sin márgenes */
+        body {
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #000;
+            height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
+            background-color: #fff;
+            overflow: hidden;
+            position: relative;
         }
 
+        /* Estilos para la imagen de fondo */
+        img {
+            width: 100vw; /* Asegura que la imagen ocupe el 100% del ancho */
+            height: 100vh; /* Asegura que la imagen ocupe el 100% de la altura */
+            object-fit: cover; /* Hace que la imagen cubra el área sin distorsionarse */
+            object-position: center center; /* Asegura que la imagen esté centrada */
+            cursor: pointer;
+        }
+
+        /* Estilo para la pantalla de inicio */
         .start-page {
+            position: absolute;
             width: 100%;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background: url('https://camparmusica.github.io/campar.png') no-repeat center center;
             background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .play-button {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: transparent;
-            position: absolute;
-        }
-
-        .play-button::before {
-            content: "";
-            display: block;
-            width: 0;
-            height: 0;
-            border-left: 20px solid #321311;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
+            cursor: pointer; /* Cambia el cursor al pasar sobre la imagen */
         }
 
         canvas {
-            display: none;
+            display: none; /* El canvas está oculto hasta que comience el juego */
         }
     </style>
 </head>
 <body>
-    <div class="start-page">
-        <div class="play-button" id="playButton"></div>
+    <!-- Página de inicio con la imagen que ocupa toda la pantalla -->
+    <div class="start-page" id="startPage">
+        <img src="https://camparmusica.github.io/campar.png" alt="Campar" id="startImage">
     </div>
+
     <canvas id="gameCanvas" width="300" height="300"></canvas>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
-        const playButton = document.getElementById("playButton");
+        const startPage = document.getElementById("startPage");
+        const startImage = document.getElementById("startImage");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
@@ -78,13 +72,14 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
-        playButton.addEventListener("click", startGame);
-        playButton.addEventListener("touchstart", startGame);
+        // Al hacer clic en la imagen o la página de inicio, se inicia el juego
+        startImage.addEventListener("click", startGame);
+        startPage.addEventListener("click", startGame);
 
         function startGame() {
-            document.querySelector('.start-page').style.display = "none";
-            canvas.style.display = "block";
-            gameLoop();
+            startPage.style.display = "none"; // Oculta la pantalla de inicio
+            canvas.style.display = "block";  // Muestra el canvas del juego
+            gameLoop();  // Comienza el juego
         }
 
         document.addEventListener("keydown", event => {
