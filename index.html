@@ -8,30 +8,62 @@
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
     
     <style>
-        * {
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
+            height: 100vh;
+            width: 100vw;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: black; /* Para evitar bordes blancos */
+            background-color: black;
+            overflow: hidden;
+            position: relative;
         }
 
-        img {
-            max-width: 100vw;
-            max-height: 100vh;
-            width: auto;
-            height: auto;
-            object-fit: contain;
+        /* Contenedor de la imagen de introducción */
+        #intro {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://camparmusica.github.io/campar.png') no-repeat center center;
+            background-size: contain; /* Se ajusta sin recortar */
+            background-color: black; /* Fondo negro si la imagen no cubre todo */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Contenedor del juego */
+        #gameContainer {
+            display: none; /* Se oculta al inicio */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://camparmusica.github.io/fondo.png');
+            background-size: cover;
+            background-position: center;
         }
     </style>
 </head>
 <body>
-    <img src="https://camparmusica.github.io/campar.png" alt="Campar">
+
+    <div id="intro"></div> <!-- Pantalla de presentación -->
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+    </div>
+
+    <script>
+        // Esperar 3 segundos antes de cambiar a la pantalla del juego
+        setTimeout(() => {
+            document.getElementById("intro").style.display = "none";
+            document.getElementById("gameContainer").style.display = "flex";
+        }, 3000); // Tiempo en milisegundos (3 segundos)
+    </script>
+
 </body>
 </html>
