@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campar</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
-
+    
     <style>
-        /* El body debe ocupar toda la pantalla sin márgenes */
         body {
             margin: 0;
             padding: 0;
@@ -21,52 +19,115 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        /* El logo */
-        #logo {
-            position: absolute;
-            width: 100px;  /* Ajusta el tamaño del logo */
-            height: 100px;
-            background-image: url('https://camparmusica.github.io/logo.png');
-            background-size: cover;
             cursor: pointer;
         }
 
+        canvas {
+            display: none;
+            image-rendering: pixelated;
+        }
+
+        .controls {
+            display: none;
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .controls button {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .controls {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
 
-    <div id="logo"></div>
+    <div class="controls">
+        <button onclick="changeDirection('UP')">⬆️</button><br>
+        <button onclick="changeDirection('LEFT')">⬅️</button>
+        <button onclick="changeDirection('DOWN')">⬇️</button>
+        <button onclick="changeDirection('RIGHT')">➡️</button>
+    </div>
 
     <script>
-        // Enlace al que redirigir
-        const link = "https://www.google.com/search?q=campar&oq=campar+&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQABiABDIHCAIQABiABDIJCAMQABgKGIAEMgkIBBAAGAoYgAQyBggFEEUYPDIGCAYQRRg8MgYIBxBFGD3SAQgyMDk5ajBqN6gCALACAA&sourceid=chrome&ie=UTF-8";
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+        let direction = "RIGHT";
+        let food = {x: 100, y: 100};
+        let score = 0;
+        const link = "https://www.google.com/search?q=campar&oq=campar+";
         
-        const logo = document.getElementById('logo');
-        
-        // Función para mover el logo aleatoriamente
-        function moveLogo() {
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-
-            // Calcular posiciones aleatorias dentro de la pantalla
-            const randomX = Math.random() * (screenWidth - 100);  // Ajuste para el tamaño del logo
-            const randomY = Math.random() * (screenHeight - 100);  // Ajuste para el tamaño del logo
-
-            // Mover el logo a la nueva posición
-            logo.style.left = randomX + 'px';
-            logo.style.top = randomY + 'px';
-        }
-
-        // Hacer que el logo se mueva cada 0.7 segundos
-        setInterval(moveLogo, 700);
-
-        // Redirigir al hacer clic en el logo
-        logo.addEventListener('click', function() {
-            window.location.href = link;
+        document.body.addEventListener("click", () => {
+            canvas.style.display = "block";
+            gameLoop();
         });
+        
+        document.addEventListener("keydown", event => {
+            changeDirection(event.key);
+        });
+        
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w" || key === "UP") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s" || key === "DOWN") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a" || key === "LEFT") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d" || key === "RIGHT") && direction !== "LEFT") direction = "RIGHT";
+        }
+        
+        function drawBackground() {
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+        
+        function gameLoop() {
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= gridSize;
+            if (direction === "DOWN") head.y += gridSize;
+            if (direction === "LEFT") head.x -= gridSize;
+            if (direction === "RIGHT") head.x += gridSize;
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                if (score === 3) window.location.href = link;
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+            } else {
+                snake.pop();
+            }
+            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+                direction = "RIGHT";
+                score = 0;
+            }
+            
+            drawBackground();
+            
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+            });
+            
+            ctx.fillStyle = "#FFD62C";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            
+            setTimeout(gameLoop, 100);
+        }
     </script>
-
 </body>
 </html>
