@@ -20,11 +20,32 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            position: relative;
         }
 
         canvas {
             display: none;
             image-rendering: pixelated;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            position: absolute;
+        }
+
+        .play-button::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 20px solid #321311;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
         }
 
         .controls {
@@ -41,26 +62,15 @@
             font-size: 20px;
             margin: 5px;
         }
-
-        @media (max-width: 600px) {
-            .controls {
-                display: block;
-            }
-        }
     </style>
 </head>
 <body>
+    <div class="play-button" id="playButton"></div>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
-
-    <div class="controls">
-        <button onclick="changeDirection('UP')">⬆️</button><br>
-        <button onclick="changeDirection('LEFT')">⬅️</button>
-        <button onclick="changeDirection('DOWN')">⬇️</button>
-        <button onclick="changeDirection('RIGHT')">➡️</button>
-    </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
+        const playButton = document.getElementById("playButton");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
@@ -69,7 +79,8 @@
         let score = 0;
         const link = "https://www.google.com/search?q=campar&oq=campar+";
         
-        document.body.addEventListener("click", () => {
+        playButton.addEventListener("click", () => {
+            playButton.style.display = "none";
             canvas.style.display = "block";
             gameLoop();
         });
@@ -123,7 +134,7 @@
                 ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
             });
             
-            ctx.fillStyle = "#FFD62C";
+            ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
             setTimeout(gameLoop, 100);
@@ -131,3 +142,6 @@
     </script>
 </body>
 </html>
+
+
+
