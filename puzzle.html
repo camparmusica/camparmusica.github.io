@@ -27,41 +27,6 @@
             display: none;
             image-rendering: pixelated;
         }
-
-        .play-button {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: transparent;
-            position: absolute;
-        }
-
-        .play-button::before {
-            content: "";
-            display: block;
-            width: 0;
-            height: 0;
-            border-left: 20px solid #321311;
-            border-top: 12px solid transparent;
-            border-bottom: 12px solid transparent;
-        }
-
-        .controls {
-            display: none;
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .controls button {
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            margin: 5px;
-        }
     </style>
 </head>
 <body>
@@ -78,33 +43,53 @@
         let food = {x: 100, y: 100};
         let score = 0;
         const link = "https://www.google.com/search?q=campar&oq=campar+";
-        
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
         playButton.addEventListener("click", () => {
             playButton.style.display = "none";
             canvas.style.display = "block";
             gameLoop();
         });
-        
+
         document.addEventListener("keydown", event => {
             changeDirection(event.key);
         });
-        
-        function changeDirection(key) {
-            if ((key === "ArrowUp" || key === "w" || key === "UP") && direction !== "DOWN") direction = "UP";
-            if ((key === "ArrowDown" || key === "s" || key === "DOWN") && direction !== "UP") direction = "DOWN";
-            if ((key === "ArrowLeft" || key === "a" || key === "LEFT") && direction !== "RIGHT") direction = "LEFT";
-            if ((key === "ArrowRight" || key === "d" || key === "RIGHT") && direction !== "LEFT") direction = "RIGHT";
-        }
-        
-        function drawBackground() {
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                for (let x = 0; x < canvas.width; x += gridSize) {
-                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
-                    ctx.fillRect(x, y, gridSize, gridSize);
-                }
+
+        canvas.addEventListener("touchstart", event => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
+
+        canvas.addEventListener("touchmove", event => {
+            if (event.touches.length > 1) return; 
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+            } else {
+                if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
             }
+        });
+
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
         }
-        
+
+        function drawBackground() {
+            ctx.fillStyle = "#26A31C";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
         function gameLoop() {
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= gridSize;
@@ -142,6 +127,3 @@
     </script>
 </body>
 </html>
-
-
-
