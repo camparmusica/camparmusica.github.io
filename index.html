@@ -46,21 +46,64 @@
 
         canvas {
             display: none; /* El canvas está oculto hasta que comience el juego */
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campar</title>
+    
+    <link rel="icon" href="https://camparmusica.github.io/favicon.png" type="image/png">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url('https://camparmusica.github.io/fondo.png');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        canvas {
+            display: none;
+            image-rendering: pixelated;
+        }
+
+        .play-button {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            position: absolute;
+        }
+
+        .play-button::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            border-left: 20px solid #321311;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
         }
     </style>
 </head>
 <body>
-    <!-- Página de inicio con la imagen que ocupa toda la pantalla -->
-    <div class="start-page" id="startPage">
-        <img src="https://camparmusica.github.io/campar.png" alt="Campar" id="startImage">
-    </div>
-
+    <div class="play-button" id="playButton"></div>
     <canvas id="gameCanvas" width="300" height="300"></canvas>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
-        const startPage = document.getElementById("startPage");
-        const startImage = document.getElementById("startImage");
+        const playButton = document.getElementById("playButton");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
@@ -72,14 +115,13 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
-        // Al hacer clic en la imagen o la página de inicio, se inicia el juego
-        startImage.addEventListener("click", startGame);
-        startPage.addEventListener("click", startGame);
+        playButton.addEventListener("click", startGame);
+        playButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            startPage.style.display = "none"; // Oculta la pantalla de inicio
-            canvas.style.display = "block";  // Muestra el canvas del juego
-            gameLoop();  // Comienza el juego
+            playButton.style.display = "none";
+            canvas.style.display = "block";
+            gameLoop();
         }
 
         document.addEventListener("keydown", event => {
