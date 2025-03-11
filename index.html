@@ -63,6 +63,17 @@
             z-index: 1; /* Aseguramos que el canvas esté sobre el fondo */
         }
 
+        /* Contenedor para los destellos */
+        .flash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2; /* Asegura que esté encima del canvas */
+            pointer-events: none; /* Para no interferir con el juego */
+        }
+
         /* Efecto de destello en los mosaicos */
         @keyframes flash {
             0% { background-color: rgba(255, 0, 0, 0.5); }
@@ -76,19 +87,6 @@
             animation: flash 0.6s ease-out;
         }
 
-        /* Efecto para las casillas del fondo */
-        .grid-flash {
-            animation: gridFlash 0.6s infinite;
-        }
-
-        @keyframes gridFlash {
-            0% { background-color: rgba(255, 0, 0, 0.5); }
-            25% { background-color: rgba(255, 100, 100, 0.6); }
-            50% { background-color: rgba(255, 150, 150, 0.7); }
-            75% { background-color: rgba(255, 200, 200, 0.8); }
-            100% { background-color: rgba(255, 0, 0, 0.5); }
-        }
-
     </style>
 </head>
 <body>
@@ -99,10 +97,14 @@
     <!-- Canvas del juego -->
     <canvas id="gameCanvas" width="300" height="300"></canvas>
 
+    <!-- Capa de destellos por encima del canvas -->
+    <div class="flash-overlay" id="flashOverlay"></div>
+
     <script>
         // Código del juego de Snake
 
         const canvas = document.getElementById("gameCanvas");
+        const flashOverlay = document.getElementById("flashOverlay");
         const startGameButton = document.getElementById("startGame");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
@@ -203,12 +205,12 @@
         }
 
         function triggerFlash() {
-            // Activar el efecto de destello sobre el canvas (juego)
-            canvas.classList.add("grid-flash");
+            // Activar el efecto de destello sobre la capa (por encima del canvas)
+            flashOverlay.classList.add("flash");
 
             // Eliminar las clases de destello después de 0.6 segundos
             setTimeout(() => {
-                canvas.classList.remove("grid-flash");
+                flashOverlay.classList.remove("flash");
             }, 600);
         }
     </script>
