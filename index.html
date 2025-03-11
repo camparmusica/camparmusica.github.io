@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lobby</title>
     <style>
         * {
@@ -50,20 +50,17 @@
 
         /* Contenedor del canvas */
         .game-container {
-            display: none;
-            position: relative;
-            width: 100vmin;
-            max-width: 400px;
-            aspect-ratio: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: none; /* Oculto hasta que inicie el juego */
+            position: relative; /* Necesario para el overlay */
+            width: 320px;
+            height: 320px;
         }
 
         /* Canvas centrado */
         #gameCanvas {
             width: 100%;
             height: 100%;
+            display: block;
             background: #f4f4f4;
         }
 
@@ -102,7 +99,7 @@
 
     <!-- Contenedor del juego -->
     <div class="game-container" id="gameContainer">
-        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
         <div class="flash-overlay" id="flashOverlay"></div>
     </div>
 
@@ -112,8 +109,8 @@
         const startGameButton = document.getElementById("startGame");
         const gameContainer = document.getElementById("gameContainer");
         const ctx = canvas.getContext("2d");
-        const gridSize = 20;
-        let snake = [{x: 200, y: 200}, {x: 180, y: 200}, {x: 160, y: 200}];
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
         let direction = "RIGHT";
         let food = {x: 100, y: 100};
         let score = 0;
@@ -126,7 +123,7 @@
 
         function startGame() {
             document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex"; 
+            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
             gameLoop();
         }
 
@@ -173,9 +170,6 @@
 
         function gameLoop() {
             let head = { ...snake[0] };
-            head.x = Math.round(head.x / gridSize) * gridSize;
-            head.y = Math.round(head.y / gridSize) * gridSize;
-
             if (direction === "UP") head.y -= gridSize;
             if (direction === "DOWN") head.y += gridSize;
             if (direction === "LEFT") head.x -= gridSize;
@@ -184,23 +178,25 @@
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
-                food = {x: Math.floor(Math.random() * 20) * gridSize, y: Math.floor(Math.random() * 20) * gridSize};
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
             } else {
                 snake.pop();
             }
             
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
                 triggerFlash(); 
-                snake = [{x: 200, y: 200}, {x: 180, y: 200}, {x: 160, y: 200}];
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
                 direction = "RIGHT";
                 score = 0;
             }
             
             drawBackground();
-            snake.forEach(seg => {
-                ctx.fillStyle = "#FFD62C";
+            
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
                 ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
             });
+            
             ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
@@ -210,7 +206,10 @@
         function triggerFlash() {
             flashOverlay.style.display = "block";
             flashOverlay.classList.add("flash");
-            setTimeout(() => flashOverlay.style.display = "none", 600);
+            setTimeout(() => {
+                flashOverlay.classList.remove("flash");
+                flashOverlay.style.display = "none";
+            }, 600);
         }
     </script>
 </body>
