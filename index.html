@@ -72,6 +72,7 @@
             height: 100%;
             z-index: 2; /* Asegura que esté encima del canvas */
             pointer-events: none; /* Para no interferir con el juego */
+            display: none; /* Iniciar oculto */
         }
 
         /* Efecto de destello en los mosaicos */
@@ -205,12 +206,16 @@
         }
 
         function triggerFlash() {
-            // Activar el efecto de destello sobre la capa (por encima del canvas)
+            // Hacer visible la capa de destellos
+            flashOverlay.style.display = "block";
+
+            // Activar el efecto de destello
             flashOverlay.classList.add("flash");
 
             // Eliminar las clases de destello después de 0.6 segundos
             setTimeout(() => {
                 flashOverlay.classList.remove("flash");
+                flashOverlay.style.display = "none";  // Ocultar de nuevo la capa de destello
             }, 600);
         }
     </script>
