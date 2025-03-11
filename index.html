@@ -23,6 +23,17 @@
             align-items: center;
             background: url('fondo.png') no-repeat center center fixed;
             background-size: cover;
+            overflow: hidden; /* Para evitar el desplazamiento */
+        }
+
+        /* Evitar que la pantalla se mueva en dispositivos móviles */
+        body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
         }
 
         /* Contenedor del lobby */
@@ -36,8 +47,8 @@
 
         /* Logo */
         .logo {
-            max-width: 30%; /* Se adapta a la pantalla */
-            max-height: 30%;
+            max-width: 80%; /* Se adapta a la pantalla */
+            max-height: 80%;
             object-fit: contain;
             cursor: pointer;
         }
@@ -47,6 +58,22 @@
             display: none;
             background: #f4f4f4;
         }
+
+        /* Efecto de destello */
+        @keyframes flash {
+            0% { background-color: rgba(255, 0, 0, 0.5); }
+            16% { background-color: rgba(0, 255, 0, 0.5); }
+            33% { background-color: rgba(0, 0, 255, 0.5); }
+            50% { background-color: rgba(255, 255, 0, 0.5); }
+            66% { background-color: rgba(255, 165, 0, 0.5); }
+            83% { background-color: rgba(75, 0, 130, 0.5); }
+            100% { background-color: rgba(255, 0, 0, 0.5); }
+        }
+
+        .flash {
+            animation: flash 0.6s ease-out; /* Duración del destello */
+        }
+
     </style>
 </head>
 <body>
@@ -68,7 +95,6 @@
         let direction = "RIGHT";
         let food = {x: 100, y: 100};
         let score = 0;
-        const link = "https://www.google.com/search?q=campar&oq=campar+"; // Aquí puedes poner la URL del juego cuando lo tengas
 
         let touchStartX = 0;
         let touchStartY = 0;
@@ -135,16 +161,17 @@
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
-                if (score === 3) window.location.href = link;
                 food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
             } else {
                 snake.pop();
             }
             
+            // Detectar si la serpiente se muerde a sí misma o se sale de los límites
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                triggerFlash();  // Activar el destello
                 snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
                 direction = "RIGHT";
-                score = 0;
+                score = 0;  // Reiniciar la puntuación
             }
             
             drawBackground();
@@ -157,7 +184,17 @@
             ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
-            setTimeout(gameLoop, 100);
+            setTimeout(gameLoop, 100);  // Mantener el juego corriendo sin fin
+        }
+
+        function triggerFlash() {
+            // Agregar la clase 'flash' al body para el efecto de destello
+            document.body.classList.add("flash");
+
+            // Eliminar la clase después de 0.6 segundos para detener el efecto
+            setTimeout(() => {
+                document.body.classList.remove("flash");
+            }, 600);
         }
     </script>
 </body>
