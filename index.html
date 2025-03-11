@@ -5,77 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lobby</title>
     <style>
-        /* Reset de márgenes y rellenos */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Fondo de pantalla */
         body, html {
             height: 100%;
             width: 100%;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             background: url('fondo.png') no-repeat center center fixed;
             background-size: cover;
-            overflow: hidden; /* Para evitar el desplazamiento */
+            overflow: hidden;
         }
 
-        /* Evitar que la pantalla se mueva en dispositivos móviles */
+        /* Evita el desplazamiento en móviles */
         body {
             position: fixed;
             width: 100%;
             height: 100%;
-            top: 0;
-            left: 0;
             overflow: hidden;
         }
 
-        /* Contenedor del lobby */
+        /* Lobby */
         .lobby-container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
             width: 100%;
+            position: absolute;
         }
 
         /* Logo */
         .logo {
-            max-width: 80%; /* Se adapta a la pantalla */
+            max-width: 80%;
             max-height: 80%;
             object-fit: contain;
             cursor: pointer;
         }
 
-        /* Estilo para el canvas del juego */
-        #gameCanvas {
-            display: none;
-            background: #f4f4f4;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1; /* Aseguramos que el canvas esté sobre el fondo */
+        /* Contenedor del canvas */
+        .game-container {
+            display: none; /* Oculto hasta que inicie el juego */
+            position: relative; /* Necesario para el overlay */
+            width: 320px;
+            height: 320px;
         }
 
-        /* Contenedor para los destellos */
+        /* Canvas centrado */
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #f4f4f4;
+        }
+
+        /* Overlay del destello solo sobre el canvas */
         .flash-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 2; /* Asegura que esté encima del canvas */
-            pointer-events: none; /* Para no interferir con el juego */
-            display: none; /* Iniciar oculto */
+            z-index: 2;
+            pointer-events: none;
+            display: none;
         }
 
-        /* Efecto de destello en los mosaicos */
+        /* Efecto de destello */
         @keyframes flash {
             0% { background-color: rgba(255, 0, 0, 0.5); }
             25% { background-color: rgba(255, 50, 50, 0.6); }
@@ -91,22 +92,22 @@
     </style>
 </head>
 <body>
+
     <div class="lobby-container" id="lobbyContainer">
         <img src="logo.png" alt="Logo" class="logo" id="startGame">
     </div>
 
-    <!-- Canvas del juego -->
-    <canvas id="gameCanvas" width="300" height="300"></canvas>
-
-    <!-- Capa de destellos por encima del canvas -->
-    <div class="flash-overlay" id="flashOverlay"></div>
+    <!-- Contenedor del juego -->
+    <div class="game-container" id="gameContainer">
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+        <div class="flash-overlay" id="flashOverlay"></div>
+    </div>
 
     <script>
-        // Código del juego de Snake
-
         const canvas = document.getElementById("gameCanvas");
         const flashOverlay = document.getElementById("flashOverlay");
         const startGameButton = document.getElementById("startGame");
+        const gameContainer = document.getElementById("gameContainer");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
@@ -117,14 +118,12 @@
         let touchStartX = 0;
         let touchStartY = 0;
 
-        // Al hacer clic en el logo, iniciar el juego
         startGameButton.addEventListener("click", startGame);
         startGameButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            // Ocultar el lobby y mostrar el juego
             document.getElementById("lobbyContainer").style.display = "none";
-            canvas.style.display = "block";
+            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
             gameLoop();
         }
 
@@ -184,12 +183,11 @@
                 snake.pop();
             }
             
-            // Detectar si la serpiente se muerde a sí misma o se sale de los límites
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
-                triggerFlash();  // Activar el destello
+                triggerFlash(); 
                 snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
                 direction = "RIGHT";
-                score = 0;  // Reiniciar la puntuación
+                score = 0;
             }
             
             drawBackground();
@@ -202,20 +200,15 @@
             ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
-            setTimeout(gameLoop, 100);  // Mantener el juego corriendo sin fin
+            setTimeout(gameLoop, 100);
         }
 
         function triggerFlash() {
-            // Hacer visible la capa de destellos
             flashOverlay.style.display = "block";
-
-            // Activar el efecto de destello
             flashOverlay.classList.add("flash");
-
-            // Eliminar las clases de destello después de 0.6 segundos
             setTimeout(() => {
                 flashOverlay.classList.remove("flash");
-                flashOverlay.style.display = "none";  // Ocultar de nuevo la capa de destello
+                flashOverlay.style.display = "none";
             }, 600);
         }
     </script>
