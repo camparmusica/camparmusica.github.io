@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title>
+    <title>Lobby</title>
     <style>
         /* Reset de márgenes y rellenos */
         * {
@@ -39,14 +39,126 @@
             max-width: 80%; /* Se adapta a la pantalla */
             max-height: 80%;
             object-fit: contain;
+            cursor: pointer;
+        }
+
+        /* Estilo para el canvas del juego */
+        #gameCanvas {
+            display: none;
+            background: #f4f4f4;
         }
     </style>
 </head>
 <body>
-    <div class="lobby-container">
-        <a href="#" id="game-link">
-            <img src="logo.png" alt="Logo" class="logo">
-        </a>
+    <div class="lobby-container" id="lobbyContainer">
+        <img src="logo.png" alt="Logo" class="logo" id="startGame">
     </div>
+
+    <!-- Canvas del juego -->
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <script>
+        // Código del juego de Snake
+
+        const canvas = document.getElementById("gameCanvas");
+        const startGameButton = document.getElementById("startGame");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+        let direction = "RIGHT";
+        let food = {x: 100, y: 100};
+        let score = 0;
+        const link = "https://www.google.com/search?q=campar&oq=campar+"; // Aquí puedes poner la URL del juego cuando lo tengas
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        // Al hacer clic en el logo, iniciar el juego
+        startGameButton.addEventListener("click", startGame);
+        startGameButton.addEventListener("touchstart", startGame);
+
+        function startGame() {
+            // Ocultar el lobby y mostrar el juego
+            document.getElementById("lobbyContainer").style.display = "none";
+            canvas.style.display = "block";
+            gameLoop();
+        }
+
+        document.addEventListener("keydown", event => {
+            changeDirection(event.key);
+        });
+
+        canvas.addEventListener("touchstart", event => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
+
+        canvas.addEventListener("touchmove", event => {
+            if (event.touches.length > 1) return; 
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+            } else {
+                if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
+            }
+        });
+
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+        }
+
+        function drawBackground() {
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+
+        function gameLoop() {
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= gridSize;
+            if (direction === "DOWN") head.y += gridSize;
+            if (direction === "LEFT") head.x -= gridSize;
+            if (direction === "RIGHT") head.x += gridSize;
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                if (score === 3) window.location.href = link;
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+            } else {
+                snake.pop();
+            }
+            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+                direction = "RIGHT";
+                score = 0;
+            }
+            
+            drawBackground();
+            
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+            });
+            
+            ctx.fillStyle = "#F20000";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            
+            setTimeout(gameLoop, 100);
+        }
+    </script>
 </body>
 </html>
