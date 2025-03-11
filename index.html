@@ -57,6 +57,10 @@
         #gameCanvas {
             display: none;
             background: #f4f4f4;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1; /* Aseguramos que el canvas esté sobre el fondo */
         }
 
         /* Efecto de destello en los mosaicos */
@@ -84,6 +88,7 @@
             75% { background-color: rgba(255, 200, 200, 0.8); }
             100% { background-color: rgba(255, 0, 0, 0.5); }
         }
+
     </style>
 </head>
 <body>
@@ -198,13 +203,11 @@
         }
 
         function triggerFlash() {
-            // Activar el efecto de destello en el fondo
-            document.body.classList.add("flash");
+            // Activar el efecto de destello sobre el canvas (juego)
             canvas.classList.add("grid-flash");
 
             // Eliminar las clases de destello después de 0.6 segundos
             setTimeout(() => {
-                document.body.classList.remove("flash");
                 canvas.classList.remove("grid-flash");
             }, 600);
         }
