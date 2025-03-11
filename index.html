@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Campar</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby</title>
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="appicono.png" />
     <style>
@@ -13,20 +13,26 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        body, html {
             height: 100%;
             width: 100%;
-            overflow: hidden;
-        }
-
-        body {
             display: flex;
             justify-content: center;
             align-items: center;
             background: url('fondo.png') no-repeat center center fixed;
             background-size: cover;
+            overflow: hidden;
         }
 
+        /* Evita el desplazamiento en móviles */
+        body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* Lobby */
         .lobby-container {
             display: flex;
             justify-content: center;
@@ -36,6 +42,7 @@
             position: absolute;
         }
 
+        /* Logo */
         .logo {
             max-width: 80%;
             max-height: 80%;
@@ -43,13 +50,15 @@
             cursor: pointer;
         }
 
+        /* Contenedor del canvas */
         .game-container {
-            display: none;
-            position: relative;
+            display: none; /* Oculto hasta que inicie el juego */
+            position: relative; /* Necesario para el overlay */
             width: 320px;
             height: 320px;
         }
 
+        /* Canvas centrado */
         #gameCanvas {
             width: 100%;
             height: 100%;
@@ -57,6 +66,7 @@
             background: #f4f4f4;
         }
 
+        /* Overlay del destello solo sobre el canvas */
         .flash-overlay {
             position: absolute;
             top: 0;
@@ -68,6 +78,7 @@
             display: none;
         }
 
+        /* Efecto de destello */
         @keyframes flash {
             0% { background-color: rgba(255, 0, 0, 0.5); }
             25% { background-color: rgba(255, 50, 50, 0.6); }
@@ -79,18 +90,129 @@
         .flash {
             animation: flash 0.6s ease-out;
         }
+
     </style>
 </head>
 <body>
+
     <div class="lobby-container" id="lobbyContainer">
-        <img src="logo.png" alt="Logo" class="logo" id="startGame" />
+        <img src="logo.png" alt="Logo" class="logo" id="startGame">
     </div>
+
+    <!-- Contenedor del juego -->
     <div class="game-container" id="gameContainer">
-        <canvas id="gameCanvas" width="320" height="320"></canvas>
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
         <div class="flash-overlay" id="flashOverlay"></div>
     </div>
+
     <script>
-        // Tu JavaScript aquí (corregido y optimizado)
+        const canvas = document.getElementById("gameCanvas");
+        const flashOverlay = document.getElementById("flashOverlay");
+        const startGameButton = document.getElementById("startGame");
+        const gameContainer = document.getElementById("gameContainer");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+        let direction = "RIGHT";
+        let food = {x: 100, y: 100};
+        let score = 0;
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        startGameButton.addEventListener("click", startGame);
+        startGameButton.addEventListener("touchstart", startGame);
+
+        function startGame() {
+            document.getElementById("lobbyContainer").style.display = "none";
+            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
+            gameLoop();
+        }
+
+        document.addEventListener("keydown", event => {
+            changeDirection(event.key);
+        });
+
+        canvas.addEventListener("touchstart", event => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+        });
+
+        canvas.addEventListener("touchmove", event => {
+            if (event.touches.length > 1) return; 
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+            } else {
+                if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
+            }
+        });
+
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+        }
+
+        function drawBackground() {
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
+
+        function gameLoop() {
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= gridSize;
+            if (direction === "DOWN") head.y += gridSize;
+            if (direction === "LEFT") head.x -= gridSize;
+            if (direction === "RIGHT") head.x += gridSize;
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+            } else {
+                snake.pop();
+            }
+            
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                triggerFlash(); 
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+                direction = "RIGHT";
+                score = 0;
+            }
+            
+            drawBackground();
+            
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+            });
+            
+            ctx.fillStyle = "#F20000";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            
+            setTimeout(gameLoop, 100);
+        }
+
+        function triggerFlash() {
+            flashOverlay.style.display = "block";
+            flashOverlay.classList.add("flash");
+            setTimeout(() => {
+                flashOverlay.classList.remove("flash");
+                flashOverlay.style.display = "none";
+            }, 600);
+        }
     </script>
 </body>
 </html>
