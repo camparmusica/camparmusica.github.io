@@ -64,8 +64,7 @@
         const scoreDisplay = document.getElementById("scoreDisplay");
         const startGameButton = document.getElementById("startGame");
         const gameContainer = document.getElementById("gameContainer");
-        const gridSize = 10;
-        let snake, direction, food, score, gameInterval;
+        let snake, direction, food, score, gameInterval, gameOver;
 
         function startGame() {
             document.getElementById("lobbyContainer").style.display = "none";
@@ -74,12 +73,15 @@
             direction = "RIGHT";
             food = {x: 100, y: 100};
             score = 0;
+            gameOver = false;
             scoreDisplay.textContent = "Puntaje: " + score;
             clearInterval(gameInterval);
             gameInterval = setInterval(gameLoop, 100);
         }
 
         startGameButton.addEventListener("click", startGame);
+        document.addEventListener("click", () => { if (gameOver) startGame(); });
+        document.addEventListener("touchstart", () => { if (gameOver) startGame(); });
 
         document.addEventListener("keydown", event => {
             if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
@@ -89,44 +91,44 @@
         });
 
         function drawBackground() {
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                for (let x = 0; x < canvas.width; x += gridSize) {
-                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
-                    ctx.fillRect(x, y, gridSize, gridSize);
+            for (let y = 0; y < canvas.height; y += 10) {
+                for (let x = 0; x < canvas.width; x += 10) {
+                    ctx.fillStyle = (x / 10 + y / 10) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, 10, 10);
                 }
             }
         }
 
         function gameLoop() {
             let head = { ...snake[0] };
-            if (direction === "UP") head.y -= gridSize;
-            if (direction === "DOWN") head.y += gridSize;
-            if (direction === "LEFT") head.x -= gridSize;
-            if (direction === "RIGHT") head.x += gridSize;
+            if (direction === "UP") head.y -= 10;
+            if (direction === "DOWN") head.y += 10;
+            if (direction === "LEFT") head.x -= 10;
+            if (direction === "RIGHT") head.x += 10;
             
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
                 scoreDisplay.textContent = "Puntaje: " + score;
-                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+                food = {x: Math.floor(Math.random() * 30) * 10, y: Math.floor(Math.random() * 30) * 10};
             } else {
                 snake.pop();
             }
             
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
                 clearInterval(gameInterval);
-                scoreDisplay.textContent = "Puntaje final: " + score;
+                gameOver = true;
                 return;
             }
             
             drawBackground();
             
             ctx.fillStyle = "#F20000";
-            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            ctx.fillRect(food.x, food.y, 10, 10);
             
             snake.forEach((seg, index) => {
                 ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
-                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+                ctx.fillRect(seg.x, seg.y, 10, 10);
             });
         }
     </script>
