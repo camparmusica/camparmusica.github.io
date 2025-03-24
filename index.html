@@ -24,142 +24,69 @@
             overflow: hidden;
         }
 
-        /* Evita el desplazamiento en móviles */
-        body {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* Lobby */
-        .lobby-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            position: absolute;
-        }
-
-        /* Logo */
-        .logo {
-            max-width: 30%;
-            max-height: 30%;
-            object-fit: contain;
-            cursor: pointer;
-        }
-
-        /* Contenedor del canvas */
         .game-container {
-            display: none; /* Oculto hasta que inicie el juego */
-            position: relative; /* Necesario para el overlay */
+            display: none;
+            position: relative;
             width: 320px;
-            height: 320px;
+            height: 350px;
         }
 
-        /* Canvas centrado */
         #gameCanvas {
             width: 100%;
-            height: 100%;
+            height: 300px;
             display: block;
-            background: #f4f4f4;
         }
 
-        /* Overlay del destello solo sobre el canvas */
-        .flash-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-            display: none;
+        .score {
+            text-align: center;
+            font-size: 20px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px;
         }
-
-        /* Efecto de destello */
-        @keyframes flash {
-            0% { background-color: rgba(255, 0, 0, 0.5); }
-            25% { background-color: rgba(255, 50, 50, 0.6); }
-            50% { background-color: rgba(255, 100, 100, 0.7); }
-            75% { background-color: rgba(255, 150, 150, 0.8); }
-            100% { background-color: rgba(255, 0, 0, 0.5); }
-        }
-
-        .flash {
-            animation: flash 0.6s ease-out;
-        }
-
     </style>
 </head>
 <body>
-
     <div class="lobby-container" id="lobbyContainer">
         <img src="logo.png" alt="Logo" class="logo" id="startGame">
     </div>
 
-    <!-- Contenedor del juego -->
     <div class="game-container" id="gameContainer">
+        <div class="score" id="scoreDisplay">Puntaje: 0</div>
         <canvas id="gameCanvas" width="300" height="300"></canvas>
-        <div class="flash-overlay" id="flashOverlay"></div>
     </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
-        const flashOverlay = document.getElementById("flashOverlay");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("scoreDisplay");
         const startGameButton = document.getElementById("startGame");
         const gameContainer = document.getElementById("gameContainer");
-        const ctx = canvas.getContext("2d");
         const gridSize = 10;
-        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-        let direction = "RIGHT";
-        let food = {x: 100, y: 100};
-        let score = 0;
-
-        let touchStartX = 0;
-        let touchStartY = 0;
-
-        startGameButton.addEventListener("click", startGame);
-        startGameButton.addEventListener("touchstart", startGame);
+        let snake, direction, food, score, gameInterval;
 
         function startGame() {
             document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
-            gameLoop();
+            gameContainer.style.display = "block";
+            snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+            direction = "RIGHT";
+            food = {x: 100, y: 100};
+            score = 0;
+            scoreDisplay.textContent = "Puntaje: " + score;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(gameLoop, 100);
         }
+
+        startGameButton.addEventListener("click", startGame);
 
         document.addEventListener("keydown", event => {
-            changeDirection(event.key);
+            if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+            if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+            if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+            if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
         });
-
-        canvas.addEventListener("touchstart", event => {
-            touchStartX = event.touches[0].clientX;
-            touchStartY = event.touches[0].clientY;
-        });
-
-        canvas.addEventListener("touchmove", event => {
-            if (event.touches.length > 1) return; 
-            let touchEndX = event.touches[0].clientX;
-            let touchEndY = event.touches[0].clientY;
-            let diffX = touchEndX - touchStartX;
-            let diffY = touchEndY - touchStartY;
-
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
-                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
-            } else {
-                if (diffY > 0 && direction !== "UP") direction = "DOWN";
-                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
-            }
-        });
-
-        function changeDirection(key) {
-            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
-            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
-            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
-        }
 
         function drawBackground() {
             for (let y = 0; y < canvas.height; y += gridSize) {
@@ -180,41 +107,28 @@
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
+                scoreDisplay.textContent = "Puntaje: " + score;
                 food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
             } else {
                 snake.pop();
             }
             
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
-                triggerFlash(); 
-                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-                direction = "RIGHT";
-                score = 0;
+                clearInterval(gameInterval);
+                scoreDisplay.textContent = "Puntaje final: " + score;
+                return;
             }
             
             drawBackground();
+            
+            ctx.fillStyle = "#F20000";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
             snake.forEach((seg, index) => {
                 ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
                 ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
             });
-            
-            ctx.fillStyle = "#F20000";
-            ctx.fillRect(food.x, food.y, gridSize, gridSize);
-            
-            setTimeout(gameLoop, 100);
-        }
-
-        function triggerFlash() {
-            flashOverlay.style.display = "block";
-            flashOverlay.classList.add("flash");
-            setTimeout(() => {
-                flashOverlay.classList.remove("flash");
-                flashOverlay.style.display = "none";
-            }, 600);
         }
     </script>
 </body>
 </html>
-
-
