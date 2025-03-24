@@ -24,6 +24,7 @@
             overflow: hidden;
         }
 
+        /* Evita el desplazamiento en móviles */
         body {
             position: fixed;
             width: 100%;
@@ -49,10 +50,10 @@
             cursor: pointer;
         }
 
-        /* Contenedor del juego */
+        /* Contenedor del canvas */
         .game-container {
-            display: none;
-            position: relative;
+            display: none; /* Oculto hasta que inicie el juego */
+            position: relative; /* Necesario para el overlay */
             width: 320px;
             height: 320px;
         }
@@ -90,17 +91,6 @@
             animation: flash 0.6s ease-out;
         }
 
-        /* Estilo del puntaje */
-        #score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 24px;
-            color: white;
-            font-family: Arial, sans-serif;
-            z-index: 3;
-        }
-
     </style>
 </head>
 <body>
@@ -113,7 +103,6 @@
     <div class="game-container" id="gameContainer">
         <canvas id="gameCanvas" width="300" height="300"></canvas>
         <div class="flash-overlay" id="flashOverlay"></div>
-        <div id="score">Puntaje: 0</div>
     </div>
 
     <script>
@@ -121,7 +110,6 @@
         const flashOverlay = document.getElementById("flashOverlay");
         const startGameButton = document.getElementById("startGame");
         const gameContainer = document.getElementById("gameContainer");
-        const scoreElement = document.getElementById("score");
         const ctx = canvas.getContext("2d");
         const gridSize = 10;
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
@@ -131,38 +119,27 @@
 
         let touchStartX = 0;
         let touchStartY = 0;
-        let gameOver = false;
 
         startGameButton.addEventListener("click", startGame);
         startGameButton.addEventListener("touchstart", startGame);
 
         function startGame() {
-            if (gameOver) {
-                // Reiniciar el juego
-                score = 0;
-                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-                direction = "RIGHT";
-                gameOver = false;
-                scoreElement.textContent = "Puntaje: " + score;
-            }
-
             document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex";
+            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
             gameLoop();
         }
 
         document.addEventListener("keydown", event => {
-            if (!gameOver) changeDirection(event.key);
+            changeDirection(event.key);
         });
 
         canvas.addEventListener("touchstart", event => {
-            if (gameOver) return;
             touchStartX = event.touches[0].clientX;
             touchStartY = event.touches[0].clientY;
         });
 
         canvas.addEventListener("touchmove", event => {
-            if (event.touches.length > 1 || gameOver) return;
+            if (event.touches.length > 1) return; 
             let touchEndX = event.touches[0].clientX;
             let touchEndY = event.touches[0].clientY;
             let diffX = touchEndX - touchStartX;
@@ -209,9 +186,10 @@
             }
             
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
-                triggerFlash();
-                gameOver = true;
-                scoreElement.textContent = "Puntaje final: " + score;
+                triggerFlash(); 
+                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+                direction = "RIGHT";
+                score = 0;
             }
             
             drawBackground();
@@ -224,9 +202,7 @@
             ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
             
-            if (!gameOver) {
-                setTimeout(gameLoop, 100);
-            }
+            setTimeout(gameLoop, 100);
         }
 
         function triggerFlash() {
@@ -240,3 +216,5 @@
     </script>
 </body>
 </html>
+
+
