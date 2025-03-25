@@ -6,6 +6,7 @@
     <title>Campar</title>
     <link rel="icon" href="favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="appicono.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Nimbus+Sans+D+OT:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -52,8 +53,8 @@
 
         /* Contenedor del canvas */
         .game-container {
-            display: none; /* Oculto hasta que inicie el juego */
-            position: relative; /* Necesario para el overlay */
+            display: none;
+            position: relative;
             width: 320px;
             height: 320px;
         }
@@ -91,6 +92,70 @@
             animation: flash 0.6s ease-out;
         }
 
+        /* Game Over Screen Styles */
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        .game-over-content {
+          border: 2.4px solid #FFD62C; /* Grosor del borde reducido en un 40% (3px * 0.6 = 1.8px) */
+          border-radius: 8px;
+          padding: 10px;
+          font-family: 'Nimbus Sans D OT', sans-serif;
+          width: 70%;
+          max-width: 200px;
+        }
+
+        #restartButton {
+            margin-top: 12px;
+            padding: 6px 12px;
+            font-size: 0.8em;
+            color: #321111;
+            background-color: #FFD62C;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #restartButton:hover {
+            background-color: #00869e;
+        }
+
+        #scoreDisplay {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #321111;
+            font-size: 1.5em;
+            z-index: 10;
+            font-family: 'Nimbus Sans D OT', sans-serif;
+            padding: 0;
+            background-color: transparent;
+            border-radius: 0;
+        }
+
+        .game-over-content h2{
+            font-size: 0.9em; /* Más pequeño que antes */
+        }
+
+        .game-over-content p{
+            font-size: 0.9em;
+        }
+
     </style>
 </head>
 <body>
@@ -99,10 +164,17 @@
         <img src="logo.png" alt="Logo" class="logo" id="startGame">
     </div>
 
-    <!-- Contenedor del juego -->
     <div class="game-container" id="gameContainer">
+        <div id="scoreDisplay">Puntaje: 0</div>
         <canvas id="gameCanvas" width="300" height="300"></canvas>
         <div class="flash-overlay" id="flashOverlay"></div>
+        <div class="game-over-overlay" id="gameOverOverlay">
+            <div class = "game-over-content">
+              <h2>@camparmusica</h2>
+              <p>Puntaje: <span id="finalScore">0</span></p>
+              <button id="restartButton">Reiniciar</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -116,41 +188,70 @@
         let direction = "RIGHT";
         let food = {x: 100, y: 100};
         let score = 0;
+        let gameRunning = false;
+        let animationFrameId;
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        const gameOverOverlay = document.getElementById("gameOverOverlay");
+        const restartButton = document.getElementById("restartButton");
+        const finalScoreDisplay = document.getElementById("finalScore");
 
-        let touchStartX = 0;
-        let touchStartY = 0;
 
         startGameButton.addEventListener("click", startGame);
         startGameButton.addEventListener("touchstart", startGame);
+        restartButton.addEventListener("click", restartGame);
+        restartButton.addEventListener("touchstart", restartGame);
+
 
         function startGame() {
             document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex"; // Mostrar el contenedor centrado
+            gameContainer.style.display = "flex";
+            gameRunning = true;
+            gameOverOverlay.style.display = "none";
+            score = 0;
+            updateScoreDisplay();
             gameLoop();
         }
 
+        function restartGame() {
+            snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+            direction = "RIGHT";
+            food = {x: 100, y: 100};
+            gameRunning = true;
+            gameOverOverlay.style.display = "none";
+            score = 0;
+            updateScoreDisplay();
+            gameLoop();
+        }
+
+
         document.addEventListener("keydown", event => {
-            changeDirection(event.key);
+            if (gameRunning) {
+                changeDirection(event.key);
+            }
         });
 
         canvas.addEventListener("touchstart", event => {
-            touchStartX = event.touches[0].clientX;
-            touchStartY = event.touches[0].clientY;
+            if (gameRunning) {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            }
         });
 
         canvas.addEventListener("touchmove", event => {
-            if (event.touches.length > 1) return; 
-            let touchEndX = event.touches[0].clientX;
-            let touchEndY = event.touches[0].clientY;
-            let diffX = touchEndX - touchStartX;
-            let diffY = touchEndY - touchStartY;
+            if (gameRunning) {
+                if (event.touches.length > 1) return;
+                let touchEndX = event.touches[0].clientX;
+                let touchEndY = event.touches[0].clientY;
+                let diffX = touchEndX - touchStartX;
+                let diffY = touchEndY - touchStartY;
 
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
-                else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
-            } else {
-                if (diffY > 0 && direction !== "UP") direction = "DOWN";
-                else if (diffY < 0 && direction !== "DOWN") direction = "UP";
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                    else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+                } else {
+                    if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                    else if (diffY < 0 && direction !== "DOWN") direction = "UP";
+                }
             }
         });
 
@@ -170,39 +271,52 @@
             }
         }
 
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Puntaje: ${score}`;
+        }
+
         function gameLoop() {
+            if (!gameRunning) return;
+
             let head = { ...snake[0] };
             if (direction === "UP") head.y -= gridSize;
             if (direction === "DOWN") head.y += gridSize;
             if (direction === "LEFT") head.x -= gridSize;
             if (direction === "RIGHT") head.x += gridSize;
-            
+
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
+                updateScoreDisplay();
                 food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
             } else {
                 snake.pop();
             }
-            
+
             if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
-                triggerFlash(); 
-                snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-                direction = "RIGHT";
-                score = 0;
+                gameOver();
+                return;
             }
-            
+
             drawBackground();
-            
+
             snake.forEach((seg, index) => {
                 ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
                 ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
             });
-            
+
             ctx.fillStyle = "#F20000";
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
-            
-            setTimeout(gameLoop, 100);
+
+            animationFrameId = setTimeout(gameLoop, 100);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            clearTimeout(animationFrameId);
+            triggerFlash();
+            finalScoreDisplay.textContent = score;
+            gameOverOverlay.style.display = "flex";
         }
 
         function triggerFlash() {
@@ -216,5 +330,3 @@
     </script>
 </body>
 </html>
-
-
