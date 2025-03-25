@@ -23,6 +23,7 @@
             background: url('fondo.png') no-repeat center center fixed;
             background-size: cover;
             overflow: hidden;
+            touch-action: manipulation; /* Evita el zoom con doble toque */
         }
 
         /* Evita el desplazamiento en móviles */
@@ -149,7 +150,7 @@
         }
 
         .game-over-content h2{
-            font-size: 0.9em; /* Más pequeño que antes */
+            font-size: 0.9em;
         }
 
         .game-over-content p{
@@ -194,7 +195,8 @@
         const gameOverOverlay = document.getElementById("gameOverOverlay");
         const restartButton = document.getElementById("restartButton");
         const finalScoreDisplay = document.getElementById("finalScore");
-
+        let touchStartX = 0;
+        let touchStartY = 0;
 
         startGameButton.addEventListener("click", startGame);
         startGameButton.addEventListener("touchstart", startGame);
@@ -230,14 +232,16 @@
             }
         });
 
-        canvas.addEventListener("touchstart", event => {
+        // Escucha los eventos táctiles en todo el documento
+        document.addEventListener("touchstart", event => {
             if (gameRunning) {
                 touchStartX = event.touches[0].clientX;
                 touchStartY = event.touches[0].clientY;
+                // event.preventDefault(); // No es necesario aquí, se maneja en touchmove
             }
         });
 
-        canvas.addEventListener("touchmove", event => {
+        document.addEventListener("touchmove", event => {
             if (gameRunning) {
                 if (event.touches.length > 1) return;
                 let touchEndX = event.touches[0].clientX;
@@ -252,6 +256,7 @@
                     if (diffY > 0 && direction !== "UP") direction = "DOWN";
                     else if (diffY < 0 && direction !== "DOWN") direction = "UP";
                 }
+                event.preventDefault(); // Evita el desplazamiento de la página
             }
         });
 
