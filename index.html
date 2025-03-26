@@ -18,13 +18,12 @@
             height: 100%;
             width: 100%;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             background: url('fondo.png') no-repeat center center fixed;
             background-size: cover;
             overflow: hidden;
-            touch-action: manipulation;
+            touch-action: manipulation; /* Evita el zoom con doble toque */
         }
 
         /* Evita el desplazamiento en móviles */
@@ -59,7 +58,6 @@
             position: relative;
             width: 320px;
             height: 320px;
-            margin-bottom: 70px;
         }
 
         /* Canvas centrado */
@@ -113,39 +111,24 @@
             text-align: center;
         }
         .game-over-content {
-            border: 2.4px solid #FFD62C;
-            border-radius: 8px;
-            padding: 15px;
-            font-family: 'Nimbus Sans D OT', sans-serif;
-            width: 80%;
-            max-width: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .game-over-content h2{
-            font-size: 1em;
-            margin-bottom: 10px;
-        }
-
-        .game-over-content p{
-            font-size: 0.9em;
-            margin-bottom: 5px;
+          border: 2.4px solid #FFD62C; /* Grosor del borde reducido en un 40% (3px * 0.6 = 1.8px) */
+          border-radius: 8px;
+          padding: 10px;
+          font-family: 'Nimbus Sans D OT', sans-serif;
+          width: 70%;
+          max-width: 200px;
         }
 
         #restartButton {
-            margin-top: 18px;
-            padding: 8px 16px;
-            font-size: 0.9em;
+            margin-top: 12px;
+            padding: 6px 12px;
+            font-size: 0.8em;
             color: #321111;
             background-color: #FFD62C;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            width: 100%;
-            max-width: 200px;
         }
 
         #restartButton:hover {
@@ -166,81 +149,12 @@
             border-radius: 0;
         }
 
-        #topScoresDisplay {
-            color: #FFD62C;
+        .game-over-content h2{
             font-size: 0.9em;
-            z-index: 11;
-            font-family: 'Nimbus Sans D OT', sans-serif;
-            text-align: left;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: 1px solid #FFD62C;
-            margin-top: 20px;
-            width: 80%;
-            max-width: 300px;
-            align-self: center;
         }
 
-        #topScoresDisplay h3 {
-            margin-bottom: 5px;
-            font-size: 1em;
-            color: #FFD62C;
-            text-align: center;
-        }
-
-        #topScoresDisplay ol {
-            margin-left: 20px;
-            padding-left: 0;
-            list-style-position: inside;
-        }
-
-        #topScoresDisplay ol li {
-            padding: 2px 0;
-            color: white;
-            font-size: 0.7em; /* Reduce el tamaño de la fuente de los nombres */
-        }
-
-        #finalScoreDisplay{
-            color: #FFD62C;
-            font-size: 1.2em;
-        }
-
-        /* Estilos para el input del nombre */
-        #nameInput {
-            padding: 8px;
-            margin: 10px 0;
+        .game-over-content p{
             font-size: 0.9em;
-            border: 1px solid #FFD62C;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 280px;
-            background-color: #FFF;
-            color: #321111;
-            font-family: 'Nimbus Sans D OT', sans-serif;
-        }
-
-        #nameInput:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(255, 214, 44, 0.7);
-        }
-
-        #saveScoreButton {
-            margin-top: 10px;
-            padding: 8px 16px;
-            font-size: 0.9em;
-            color: #321111;
-            background-color: #FFD62C;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        #saveScoreButton:hover {
-            background-color: #00869e;
         }
 
     </style>
@@ -259,15 +173,8 @@
             <div class = "game-over-content">
               <h2>@camparmusica</h2>
               <p>Puntaje: <span id="finalScore">0</span></p>
-              <input type="text" id="nameInput" placeholder="Ingrese su nombre" maxlength="15">
-              <button id="saveScoreButton">Guardar Puntaje</button>
               <button id="restartButton">Reiniciar</button>
             </div>
-        </div>
-        <div id="topScoresDisplay">
-            <h3>Mejores Puntajes</h3>
-            <ol id="topScoresList">
-            </ol>
         </div>
     </div>
 
@@ -290,19 +197,11 @@
         const finalScoreDisplay = document.getElementById("finalScore");
         let touchStartX = 0;
         let touchStartY = 0;
-        const topScoresList = document.getElementById("topScoresList");
-        const maxTopScores = 3;
-        let topScores = JSON.parse(localStorage.getItem('topSnakeScores')) || [];
-        const nameInput = document.getElementById("nameInput");
-        const saveScoreButton = document.getElementById("saveScoreButton");
-
 
         startGameButton.addEventListener("click", startGame);
         startGameButton.addEventListener("touchstart", startGame);
         restartButton.addEventListener("click", restartGame);
         restartButton.addEventListener("touchstart", restartGame);
-        saveScoreButton.addEventListener("click", saveScoreAndRestart);
-        saveScoreButton.addEventListener("touchstart", saveScoreAndRestart);
 
 
         function startGame() {
@@ -312,7 +211,6 @@
             gameOverOverlay.style.display = "none";
             score = 0;
             updateScoreDisplay();
-            displayTopScores();
             gameLoop();
         }
 
@@ -324,18 +222,7 @@
             gameOverOverlay.style.display = "none";
             score = 0;
             updateScoreDisplay();
-            nameInput.value = "";
             gameLoop();
-        }
-
-        function saveScoreAndRestart() {
-            const playerName = nameInput.value.trim();
-            if (playerName === "") {
-                alert("Por favor, ingrese su nombre para guardar su puntaje.");
-                return;
-            }
-            saveScore(playerName);
-            restartGame();
         }
 
 
@@ -345,10 +232,12 @@
             }
         });
 
+        // Escucha los eventos táctiles en todo el documento
         document.addEventListener("touchstart", event => {
             if (gameRunning) {
                 touchStartX = event.touches[0].clientX;
                 touchStartY = event.touches[0].clientY;
+                // event.preventDefault(); // No es necesario aquí, se maneja en touchmove
             }
         });
 
@@ -367,7 +256,7 @@
                     if (diffY > 0 && direction !== "UP") direction = "DOWN";
                     else if (diffY < 0 && direction !== "DOWN") direction = "UP";
                 }
-                event.preventDefault();
+                event.preventDefault(); // Evita el desplazamiento de la página
             }
         });
 
@@ -389,32 +278,6 @@
 
         function updateScoreDisplay() {
             scoreDisplay.textContent = `Puntaje: ${score}`;
-        }
-
-        function saveScore(playerName) {
-            if (topScores.length < maxTopScores || score > topScores[topScores.length - 1].score) {
-                const newScore = {
-                    name: playerName,
-                    score: score
-                };
-                topScores.push(newScore);
-                topScores.sort((a, b) => b.score - a.score);
-                if (topScores.length > maxTopScores) {
-                    topScores = topScores.slice(0, maxTopScores);
-                }
-                localStorage.setItem('topSnakeScores', JSON.stringify(topScores));
-                displayTopScores();
-            }
-        }
-
-        function displayTopScores() {
-            topScoresList.innerHTML = '';
-            topScores.forEach((s, index) => {
-                const li = document.createElement("li");
-                li.textContent = `${s.name} - ${s.score} pts`;
-                li.style.fontSize = "0.7em";
-                topScoresList.appendChild(li);
-            });
         }
 
         function gameLoop() {
@@ -459,7 +322,6 @@
             triggerFlash();
             finalScoreDisplay.textContent = score;
             gameOverOverlay.style.display = "flex";
-            nameInput.value = "";
         }
 
         function triggerFlash() {
@@ -470,8 +332,9 @@
                 flashOverlay.style.display = "none";
             }, 600);
         }
-
-        displayTopScores();
     </script>
 </body>
 </html>
+
+
+
