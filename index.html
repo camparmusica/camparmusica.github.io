@@ -55,17 +55,18 @@
         /* Contenedor del canvas */
         .game-container {
             display: none;
-            position: relative;
-            width: 320px;
-            height: 320px;
+            position: relative; /* Necesario para posicionar #scoreDisplay y overlays */
+            width: 320px; /* Ajustado para el canvas */
+            height: 320px; /* Ajustado para el canvas */
+            margin-top: 30px; /* Añade un margen superior para dar espacio al score */
         }
 
         /* Canvas centrado */
         #gameCanvas {
-            width: 100%;
-            height: 100%;
+            width: 100%; /* Ocupa todo el game-container */
+            height: 100%; /* Ocupa todo el game-container */
             display: block;
-            background: #f4f4f4;
+            /* background: #f4f4f4; -- El fondo ahora se dibuja en el canvas */
         }
 
         /* Overlay del destello solo sobre el canvas */
@@ -100,7 +101,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            /* background-color: rgba(0, 0, 0, 0.8); -- Original */
+            background-color: rgba(0, 0, 0, 0.2); /* MODIFICADO: Opacidad al 20% */
             display: none;
             flex-direction: column;
             justify-content: center;
@@ -111,12 +113,13 @@
             text-align: center;
         }
         .game-over-content {
-          border: 2.4px solid #FFD62C; /* Grosor del borde reducido en un 40% (3px * 0.6 = 1.8px) */
-          border-radius: 8px;
-          padding: 10px;
-          font-family: 'Nimbus Sans D OT', sans-serif;
-          width: 70%;
-          max-width: 200px;
+            border: 2.4px solid #FFD62C;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Nimbus Sans D OT', sans-serif;
+            width: 70%;
+            max-width: 200px;
+            background-color: rgba(0, 0, 0, 0.7); /* Añadido fondo al contenido para legibilidad */
         }
 
         #restartButton {
@@ -132,21 +135,27 @@
         }
 
         #restartButton:hover {
-            background-color: #00869e;
+            background-color: #00869e; /* Considera un color hover más acorde, ej #e0b000 */
         }
 
+        /* Estilos del puntaje mejorados */
         #scoreDisplay {
             position: absolute;
-            top: -30px;
+            top: -20px; /* Ajusta la posición vertical para que quede más pegado arriba */
             left: 50%;
             transform: translateX(-50%);
-            color: #321111;
-            font-size: 1.5em;
+            color: #FFD62C; /* Color del número (amarillo) */
+            font-size: 1.4em; /* Tamaño del número */
+            font-weight: bold; /* Hacer el número más grueso */
             z-index: 10;
             font-family: 'Nimbus Sans D OT', sans-serif;
-            padding: 0;
-            background-color: transparent;
-            border-radius: 0;
+            padding: 4px 12px; /* Espaciado interno (arriba/abajo, izquierda/derecha) */
+            background-color: rgba(50, 19, 17, 0.9); /* Fondo marrón oscuro semi-transparente (#321311 con alfa) */
+            border-radius: 8px; /* Bordes redondeados */
+            border: 1.5px solid #FFD62C; /* Borde delgado amarillo */
+            min-width: 45px; /* Ancho mínimo para que no sea muy pequeño con puntaje 0 */
+            text-align: center; /* Asegura que el número esté centrado */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25); /* Sombra suave para dar profundidad */
         }
 
         .game-over-content h2{
@@ -166,14 +175,12 @@
     </div>
 
     <div class="game-container" id="gameContainer">
-        <div id="scoreDisplay">Puntaje: 0</div>
-        <canvas id="gameCanvas" width="300" height="300"></canvas>
-        <div class="flash-overlay" id="flashOverlay"></div>
+        <div id="scoreDisplay">0</div> <canvas id="gameCanvas" width="300" height="300"></canvas> <div class="flash-overlay" id="flashOverlay"></div>
         <div class="game-over-overlay" id="gameOverOverlay">
             <div class = "game-over-content">
-              <h2>@camparmusica</h2>
-              <p>Puntaje: <span id="finalScore">0</span></p>
-              <button id="restartButton">Reiniciar</button>
+                <h2>@camparmusica</h2>
+                <p>Puntaje: <span id="finalScore">0</span></p>
+                <button id="restartButton">Reiniciar</button>
             </div>
         </div>
     </div>
@@ -184,7 +191,11 @@
         const startGameButton = document.getElementById("startGame");
         const gameContainer = document.getElementById("gameContainer");
         const ctx = canvas.getContext("2d");
-        const gridSize = 10;
+        const gridSize = 10; // Tamaño de cada celda y paso de la serpiente
+        // Ajustar tamaño canvas basado en gridSize
+        canvas.width = 320; // Múltiplo de gridSize si se desea ajuste perfecto
+        canvas.height = 320; // Múltiplo de gridSize si se desea ajuste perfecto
+
         let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
         let direction = "RIGHT";
         let food = {x: 100, y: 100};
@@ -199,32 +210,34 @@
         let touchStartY = 0;
 
         startGameButton.addEventListener("click", startGame);
-        startGameButton.addEventListener("touchstart", startGame);
+        startGameButton.addEventListener("touchstart", startGame); // Considerar preventDefault si causa problemas
         restartButton.addEventListener("click", restartGame);
-        restartButton.addEventListener("touchstart", restartGame);
-
+        restartButton.addEventListener("touchstart", restartGame); // Considerar preventDefault
 
         function startGame() {
             document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex";
+            gameContainer.style.display = "block"; // Cambiado a block o flex según prefieras
+            resetGame(); // Llama a una función que reinicia todo
             gameRunning = true;
-            gameOverOverlay.style.display = "none";
-            score = 0;
-            updateScoreDisplay();
             gameLoop();
         }
 
         function restartGame() {
-            snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-            direction = "RIGHT";
-            food = {x: 100, y: 100};
+            resetGame();
             gameRunning = true;
             gameOverOverlay.style.display = "none";
-            score = 0;
-            updateScoreDisplay();
             gameLoop();
         }
 
+        // Función para centralizar el reinicio del estado del juego
+        function resetGame() {
+            snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+            direction = "RIGHT";
+            score = 0;
+            updateScoreDisplay();
+            placeFood(); // Coloca la comida inicial
+            clearTimeout(animationFrameId); // Limpia cualquier loop anterior
+        }
 
         document.addEventListener("keydown", event => {
             if (gameRunning) {
@@ -232,42 +245,71 @@
             }
         });
 
-        // Escucha los eventos táctiles en todo el documento
-        document.addEventListener("touchstart", event => {
-            if (gameRunning) {
+        // Escucha los eventos táctiles en el contenedor del juego para más precisión
+        gameContainer.addEventListener("touchstart", event => {
+            if (gameRunning && event.touches.length === 1) { // Solo un dedo
                 touchStartX = event.touches[0].clientX;
                 touchStartY = event.touches[0].clientY;
-                // event.preventDefault(); // No es necesario aquí, se maneja en touchmove
+                event.preventDefault(); // Previene acciones por defecto como scroll
+            }
+        }, { passive: false }); // Necesario para preventDefault
+
+        gameContainer.addEventListener("touchmove", event => {
+            if (gameRunning && event.touches.length === 1) {
+                event.preventDefault(); // Previene acciones por defecto como scroll
+            }
+        }, { passive: false }); // Necesario para preventDefault
+
+        gameContainer.addEventListener("touchend", event => {
+            if (gameRunning && touchStartX !== 0) { // Asegura que hubo un touchstart
+                if (event.changedTouches.length === 1) { // Solo un dedo levantado
+                    let touchEndX = event.changedTouches[0].clientX;
+                    let touchEndY = event.changedTouches[0].clientY;
+                    handleSwipe(touchEndX, touchEndY);
+                }
+                // Resetea las coordenadas de inicio
+                touchStartX = 0;
+                touchStartY = 0;
             }
         });
 
-        document.addEventListener("touchmove", event => {
-            if (gameRunning) {
-                if (event.touches.length > 1) return;
-                let touchEndX = event.touches[0].clientX;
-                let touchEndY = event.touches[0].clientY;
-                let diffX = touchEndX - touchStartX;
-                let diffY = touchEndY - touchStartY;
+        function handleSwipe(touchEndX, touchEndY) {
+            let diffX = touchEndX - touchStartX;
+            let diffY = touchEndY - touchStartY;
+            let absDiffX = Math.abs(diffX);
+            let absDiffY = Math.abs(diffY);
 
-                if (Math.abs(diffX) > Math.abs(diffY)) {
+            // Define una sensibilidad mínima para el swipe
+            const swipeThreshold = 20;
+
+            if (absDiffX > swipeThreshold || absDiffY > swipeThreshold) { // Solo si el swipe es significativo
+                if (absDiffX > absDiffY) {
+                    // Swipe horizontal
                     if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
                     else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
                 } else {
+                    // Swipe vertical
                     if (diffY > 0 && direction !== "UP") direction = "DOWN";
                     else if (diffY < 0 && direction !== "DOWN") direction = "UP";
                 }
-                event.preventDefault(); // Evita el desplazamiento de la página
             }
-        });
+        }
+
 
         function changeDirection(key) {
-            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
-            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
-            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+            const goingUp = direction === "UP";
+            const goingDown = direction === "DOWN";
+            const goingLeft = direction === "LEFT";
+            const goingRight = direction === "RIGHT";
+
+            if ((key === "ArrowUp" || key === "w") && !goingDown) direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && !goingUp) direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && !goingRight) direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && !goingLeft) direction = "RIGHT";
         }
 
         function drawBackground() {
+            // Dibuja el fondo tipo tablero de ajedrez
             for (let y = 0; y < canvas.height; y += gridSize) {
                 for (let x = 0; x < canvas.width; x += gridSize) {
                     ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
@@ -277,51 +319,89 @@
         }
 
         function updateScoreDisplay() {
-            scoreDisplay.textContent = `Puntaje: ${score}`;
+            // MODIFICADO: Solo muestra el número
+            scoreDisplay.textContent = score;
         }
+
+        function placeFood() {
+            // Asegura que la comida no aparezca sobre la serpiente
+            let foodX, foodY;
+            do {
+                foodX = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+                foodY = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+            } while (snake.some(seg => seg.x === foodX && seg.y === foodY));
+            food = {x: foodX, y: foodY};
+        }
+
 
         function gameLoop() {
             if (!gameRunning) return;
 
-            let head = { ...snake[0] };
+            // Mover serpiente
+            let head = { ...snake[0] }; // Nueva cabeza
             if (direction === "UP") head.y -= gridSize;
             if (direction === "DOWN") head.y += gridSize;
             if (direction === "LEFT") head.x -= gridSize;
             if (direction === "RIGHT") head.x += gridSize;
 
-            snake.unshift(head);
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                updateScoreDisplay();
-                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
-            } else {
-                snake.pop();
-            }
-
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+            // Comprobar colisión con paredes
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
                 gameOver();
                 return;
             }
 
-            drawBackground();
+             // Comprobar colisión consigo misma
+             // Inicia en 1 para no comparar la cabeza consigo misma inmediatamente
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver();
+                    return;
+                }
+            }
 
+            snake.unshift(head); // Añadir nueva cabeza
+
+            // Comprobar si come la comida
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                updateScoreDisplay();
+                placeFood(); // Colocar nueva comida
+            } else {
+                snake.pop(); // Quitar la cola si no comió
+            }
+
+
+            // Dibujar todo
+            drawBackground(); // Dibujar fondo primero
+
+             // Dibujar serpiente
             snake.forEach((seg, index) => {
-                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311"; // Colores alternos
                 ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+                // Opcional: Borde para segmentos
+                ctx.strokeStyle = "#111";
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(seg.x, seg.y, gridSize, gridSize);
             });
 
-            ctx.fillStyle = "#F20000";
+            // Dibujar comida
+            ctx.fillStyle = "#F20000"; // Rojo para la comida
             ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            ctx.strokeStyle = "#500"; // Borde oscuro para la comida
+            ctx.lineWidth = 1;
+            ctx.strokeRect(food.x, food.y, gridSize, gridSize);
 
-            animationFrameId = setTimeout(gameLoop, 100);
+
+            // Siguiente frame
+            animationFrameId = setTimeout(gameLoop, 100); // Velocidad del juego (100ms = 10fps)
         }
 
         function gameOver() {
             gameRunning = false;
             clearTimeout(animationFrameId);
             triggerFlash();
-            finalScoreDisplay.textContent = score;
-            gameOverOverlay.style.display = "flex";
+            finalScoreDisplay.textContent = score; // Actualiza puntaje final en overlay
+            gameOverOverlay.style.display = "flex"; // Muestra pantalla Game Over
         }
 
         function triggerFlash() {
@@ -330,11 +410,12 @@
             setTimeout(() => {
                 flashOverlay.classList.remove("flash");
                 flashOverlay.style.display = "none";
-            }, 600);
+            }, 600); // Duración de la animación flash
         }
+
+        // Inicializar la primera comida al cargar
+        placeFood();
+
     </script>
 </body>
 </html>
-
-
-
