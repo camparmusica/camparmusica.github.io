@@ -1,344 +1,334 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campar</title>
-    <link rel="icon" href="favicon.png" type="image/png" />
-    <link rel="apple-touch-icon" href="appicono.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Nimbus+Sans+D+OT:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campar</title>
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="appicono.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Nimbus+Sans+D+OT:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        body, html {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('fondo.png') no-repeat center center fixed;
-            background-size: cover;
-            overflow: hidden;
-            touch-action: manipulation; /* Evita el zoom con doble toque */
-        }
+        body, html {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('fondo.png') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+            touch-action: manipulation; /* Evita el zoom con doble toque */
+        }
 
-        /* Evita el desplazamiento en móviles */
-        body {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+        /* Evita el desplazamiento en móviles */
+        body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
 
-        /* Lobby */
-        .lobby-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
-            position: absolute;
-        }
+        /* Lobby */
+        .lobby-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
 
-        /* Logo */
-        .logo {
-            max-width: 30%;
-            max-height: 30%;
-            object-fit: contain;
-            cursor: pointer;
-        }
+        /* Logo */
+        .logo {
+            max-width: 30%;
+            max-height: 30%;
+            object-fit: contain;
+            cursor: pointer;
+        }
 
-        /* Contenedor del canvas */
-        .game-container {
-            display: none;
-            position: relative;
-            width: 320px;
-            height: 320px;
-        }
+        /* Contenedor del canvas */
+        .game-container {
+            display: none;
+            position: relative;
+            width: 320px;
+            height: 320px;
+        }
 
-        /* Canvas centrado */
-        #gameCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            background: #f4f4f4;
-        }
+        /* Canvas centrado */
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #f4f4f4;
+        }
 
-        /* Overlay del destello solo sobre el canvas */
-        .flash-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            pointer-events: none;
-            display: none;
-        }
+        /* Overlay del destello solo sobre el canvas */
+        .flash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            display: none;
+        }
 
-        /* Efecto de destello */
-        @keyframes flash {
-            0% { background-color: rgba(255, 0, 0, 0.5); }
-            25% { background-color: rgba(255, 50, 50, 0.6); }
-            50% { background-color: rgba(255, 100, 100, 0.7); }
-            75% { background-color: rgba(255, 150, 150, 0.8); }
-            100% { background-color: rgba(255, 0, 0, 0.5); }
-        }
+        /* Efecto de destello */
+        @keyframes flash {
+            0% { background-color: rgba(255, 0, 0, 0.5); }
+            25% { background-color: rgba(255, 50, 50, 0.6); }
+            50% { background-color: rgba(255, 100, 100, 0.7); }
+            75% { background-color: rgba(255, 150, 150, 0.8); }
+            100% { background-color: rgba(255, 0, 0, 0.5); }
+        }
 
-        .flash {
-            animation: flash 0.6s ease-out;
-        }
+        .flash {
+            animation: flash 0.6s ease-out;
+        }
 
-        /* Game Over Screen Styles */
-        .game-over-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            color: white;
-            font-size: 1.2em;
-            text-align: center;
-        }
-        .game-over-content {
-          border: 2.4px solid #FFD62C; /* Grosor del borde reducido en un 40% (3px * 0.6 = 1.8px) */
-          border-radius: 8px;
-          padding: 10px;
-          font-family: 'Nimbus Sans D OT', sans-serif;
-          width: 70%;
-          max-width: 200px;
-        }
+        /* Game Over Screen Styles */
+        .game-over-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        .game-over-content {
+          border: 2.4px solid #FFD62C; /* Grosor del borde reducido en un 40% (3px * 0.6 = 1.8px) */
+          border-radius: 8px;
+          padding: 10px;
+          font-family: 'Nimbus Sans D OT', sans-serif;
+          width: 70%;
+          max-width: 200px;
+        }
 
-        #restartButton {
-            margin-top: 12px;
-            padding: 6px 12px;
-            font-size: 0.8em;
-            color: #321111;
-            background-color: #FFD62C;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+        #restartButton {
+            margin-top: 12px;
+            padding: 6px 12px;
+            font-size: 0.8em;
+            color: #321111;
+            background-color: #FFD62C;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-        #restartButton:hover {
-            background-color: #00869e;
-        }
+        #restartButton:hover {
+            background-color: #00869e;
+        }
 
-        #scoreDisplay {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #321111;
-            font-size: 1.5em;
-            z-index: 10;
-            font-family: 'Nimbus Sans D OT', sans-serif;
-            padding: 0;
-            background-color: transparent;
-            border-radius: 0;
-        }
+        #scoreDisplay {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #321111;
+            font-size: 1.5em;
+            z-index: 10;
+            font-family: 'Nimbus Sans D OT', sans-serif;
+            padding: 0;
+            background-color: transparent;
+            border-radius: 0;
+        }
 
-        .game-over-content h2{
-            font-size: 0.9em;
-        }
+        .game-over-content h2{
+            font-size: 0.9em;
+        }
 
-        .game-over-content p{
-            font-size: 0.9em;
-        }
+        .game-over-content p{
+            font-size: 0.9em;
+        }
 
-    </style>
+    </style>
 </head>
 <body>
 
-    <div class="lobby-container" id="lobbyContainer">
-        <img src="logo.png" alt="Logo" class="logo" id="startGame">
-    </div>
+    <div class="lobby-container" id="lobbyContainer">
+        <img src="logo.png" alt="Logo" class="logo" id="startGame">
+    </div>
 
-    <div class="game-container" id="gameContainer">
-        <div id="scoreDisplay">Puntaje: 0</div>
-        <canvas id="gameCanvas" width="300" height="300"></canvas>
-        <div class="flash-overlay" id="flashOverlay"></div>
-        <div class="game-over-overlay" id="gameOverOverlay">
-            <div class="game-over-content">
-              <h2>¡«Bana» disponible el 28 de noviembre!</h2>
-              <p>Puntaje: <span id="finalScore">0</span></p>
-              <button id="restartButton">Reiniciar</button>
-            </div>
-        </div>
-    </div>
+    <div class="game-container" id="gameContainer">
+        <div id="scoreDisplay">Puntaje: 0</div>
+        <canvas id="gameCanvas" width="300" height="300"></canvas>
+        <div class="flash-overlay" id="flashOverlay"></div>
+        <div class="game-over-overlay" id="gameOverOverlay">
+            <div class = "game-over-content">
+              <h2>¡«Bana» disponible el 28 de noviembre!</h2>
+              <p>Puntaje: <span id="finalScore">0</span></p>
+              <button id="restartButton">Reiniciar</button>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const flashOverlay = document.getElementById("flashOverlay");
-        const startGameButton = document.getElementById("startGame");
-        const gameContainer = document.getElementById("gameContainer");
-        const ctx = canvas.getContext("2d");
-        const gridSize = 10;
-        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-        let direction = "RIGHT";
-        let food = {x: 100, y: 100};
-        let score = 0;
-        let gameRunning = false;
-        let animationFrameId;
-        const scoreDisplay = document.getElementById("scoreDisplay");
-        const gameOverOverlay = document.getElementById("gameOverOverlay");
-        const restartButton = document.getElementById("restartButton");
-        const finalScoreDisplay = document.getElementById("finalScore");
-        let touchStartX = 0;
-        let touchStartY = 0;
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const flashOverlay = document.getElementById("flashOverlay");
+        const startGameButton = document.getElementById("startGame");
+        const gameContainer = document.getElementById("gameContainer");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 10;
+        let snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
+        let direction = "RIGHT";
+        let food = {x: 100, y: 100};
+        let score = 0;
+        let gameRunning = false;
+        let animationFrameId;
+        const scoreDisplay = document.getElementById("scoreDisplay");
+        const gameOverOverlay = document.getElementById("gameOverOverlay");
+        const restartButton = document.getElementById("restartButton");
+        const finalScoreDisplay = document.getElementById("finalScore");
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-        startGameButton.addEventListener("click", startGame);
-        startGameButton.addEventListener("touchstart", startGame);
-        restartButton.addEventListener("click", restartGame);
-        restartButton.addEventListener("touchstart", restartGame);
-
-
-        function startGame() {
-            document.getElementById("lobbyContainer").style.display = "none";
-            gameContainer.style.display = "flex";
-            gameRunning = true;
-            gameOverOverlay.style.display = "none";
-            score = 0;
-            updateScoreDisplay();
-            gameLoop();
-        }
-
-        // MODIFICACIÓN CLAVE AQUÍ
-        function restartGame() {
-            // Cambiamos el comportamiento para redirigir a un enlace externo
-            window.location.href = "https://google.com"; // <-- REEMPLAZA ESTA URL CON EL ENLACE DESEADO
-            
-            // Se eliminó el código original de reinicio del juego
-            /*
-            snake = [{x: 50, y: 50}, {x: 40, y: 50}, {x: 30, y: 50}];
-            direction = "RIGHT";
-            food = {x: 100, y: 100};
-            gameRunning = true;
-            gameOverOverlay.style.display = "none";
-            score = 0;
-            updateScoreDisplay();
-            gameLoop();
-            */
-        }
+        startGameButton.addEventListener("click", startGame);
+        startGameButton.addEventListener("touchstart", startGame);
+        restartButton.addEventListener("click", restartGame);
+        restartButton.addEventListener("touchstart", restartGame);
 
 
-        document.addEventListener("keydown", event => {
-            if (gameRunning) {
-                changeDirection(event.key);
-            }
-        });
+        function startGame() {
+            document.getElementById("lobbyContainer").style.display = "none";
+            gameContainer.style.display = "flex";
+            gameRunning = true;
+            gameOverOverlay.style.display = "none";
+            score = 0;
+            updateScoreDisplay();
+            gameLoop();
+        }
 
-        // Escucha los eventos táctiles en todo el documento
-        document.addEventListener("touchstart", event => {
-            if (gameRunning) {
-                touchStartX = event.touches[0].clientX;
-                touchStartY = event.touches[0].clientY;
-                // event.preventDefault(); // No es necesario aquí, se maneja en touchmove
-            }
-        });
+   function restartGame() {
+    window.location.href = "www.google.com"; 
+}
 
-        document.addEventListener("touchmove", event => {
-            if (gameRunning) {
-                if (event.touches.length > 1) return;
-                let touchEndX = event.touches[0].clientX;
-                let touchEndY = event.touches[0].clientY;
-                let diffX = touchEndX - touchStartX;
-                let diffY = touchEndY - touchStartY;
 
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
-                    else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
-                } else {
-                    if (diffY > 0 && direction !== "UP") direction = "DOWN";
-                    else if (diffY < 0 && direction !== "DOWN") direction = "UP";
-                }
-                event.preventDefault(); // Evita el desplazamiento de la página
-            }
-        });
 
-        function changeDirection(key) {
-            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
-            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
-            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
-            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
-        }
+        document.addEventListener("keydown", event => {
+            if (gameRunning) {
+                changeDirection(event.key);
+            }
+        });
 
-        function drawBackground() {
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                for (let x = 0; x < canvas.width; x += gridSize) {
-                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
-                    ctx.fillRect(x, y, gridSize, gridSize);
-                }
-            }
-        }
+        // Escucha los eventos táctiles en todo el documento
+        document.addEventListener("touchstart", event => {
+            if (gameRunning) {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+                // event.preventDefault(); // No es necesario aquí, se maneja en touchmove
+            }
+        });
 
-        function updateScoreDisplay() {
-            scoreDisplay.textContent = `Puntaje: ${score}`;
-        }
+        document.addEventListener("touchmove", event => {
+            if (gameRunning) {
+                if (event.touches.length > 1) return;
+                let touchEndX = event.touches[0].clientX;
+                let touchEndY = event.touches[0].clientY;
+                let diffX = touchEndX - touchStartX;
+                let diffY = touchEndY - touchStartY;
 
-        function gameLoop() {
-            if (!gameRunning) return;
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX > 0 && direction !== "LEFT") direction = "RIGHT";
+                    else if (diffX < 0 && direction !== "RIGHT") direction = "LEFT";
+                } else {
+                    if (diffY > 0 && direction !== "UP") direction = "DOWN";
+                    else if (diffY < 0 && direction !== "DOWN") direction = "UP";
+                }
+                event.preventDefault(); // Evita el desplazamiento de la página
+            }
+        });
 
-            let head = { ...snake[0] };
-            if (direction === "UP") head.y -= gridSize;
-            if (direction === "DOWN") head.y += gridSize;
-            if (direction === "LEFT") head.x -= gridSize;
-            if (direction === "RIGHT") head.x += gridSize;
+        function changeDirection(key) {
+            if ((key === "ArrowUp" || key === "w") && direction !== "DOWN") direction = "UP";
+            if ((key === "ArrowDown" || key === "s") && direction !== "UP") direction = "DOWN";
+            if ((key === "ArrowLeft" || key === "a") && direction !== "RIGHT") direction = "LEFT";
+            if ((key === "ArrowRight" || key === "d") && direction !== "LEFT") direction = "RIGHT";
+        }
 
-            snake.unshift(head);
-            if (head.x === food.x && head.y === food.y) {
-                score++;
-                updateScoreDisplay();
-                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
-            } else {
-                snake.pop();
-            }
+        function drawBackground() {
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                for (let x = 0; x < canvas.width; x += gridSize) {
+                    ctx.fillStyle = (x / gridSize + y / gridSize) % 2 === 0 ? "#26A31C" : "#227A18";
+                    ctx.fillRect(x, y, gridSize, gridSize);
+                }
+            }
+        }
 
-            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
-                gameOver();
-                return;
-            }
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Puntaje: ${score}`;
+        }
 
-            drawBackground();
+        function gameLoop() {
+            if (!gameRunning) return;
 
-            snake.forEach((seg, index) => {
-                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
-                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
-            });
+            let head = { ...snake[0] };
+            if (direction === "UP") head.y -= gridSize;
+            if (direction === "DOWN") head.y += gridSize;
+            if (direction === "LEFT") head.x -= gridSize;
+            if (direction === "RIGHT") head.x += gridSize;
 
-            ctx.fillStyle = "#F20000";
-            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                updateScoreDisplay();
+                food = {x: Math.floor(Math.random() * 30) * gridSize, y: Math.floor(Math.random() * 30) * gridSize};
+            } else {
+                snake.pop();
+            }
 
-            animationFrameId = setTimeout(gameLoop, 100);
-        }
+            if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
+                gameOver();
+                return;
+            }
 
-        function gameOver() {
-            gameRunning = false;
-            clearTimeout(animationFrameId);
-            triggerFlash();
-            finalScoreDisplay.textContent = score;
-            gameOverOverlay.style.display = "flex";
-        }
+            drawBackground();
 
-        function triggerFlash() {
-            flashOverlay.style.display = "block";
-            flashOverlay.classList.add("flash");
-            setTimeout(() => {
-                flashOverlay.classList.remove("flash");
-                flashOverlay.style.display = "none";
-            }, 600);
-        }
-    </script>
+            snake.forEach((seg, index) => {
+                ctx.fillStyle = index % 2 === 0 ? "#FFD62C" : "#321311";
+                ctx.fillRect(seg.x, seg.y, gridSize, gridSize);
+            });
+
+            ctx.fillStyle = "#F20000";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+            animationFrameId = setTimeout(gameLoop, 100);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            clearTimeout(animationFrameId);
+            triggerFlash();
+            finalScoreDisplay.textContent = score;
+            gameOverOverlay.style.display = "flex";
+        }
+
+        function triggerFlash() {
+            flashOverlay.style.display = "block";
+            flashOverlay.classList.add("flash");
+            setTimeout(() => {
+                flashOverlay.classList.remove("flash");
+                flashOverlay.style.display = "none";
+            }, 600);
+        }
+    </script>
 </body>
 </html>
+
+
